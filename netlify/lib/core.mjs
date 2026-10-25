@@ -86,18 +86,19 @@ function rangeSum(S, from, to) {
 
 /* ---------- สร้าง Card V2 สำหรับ Google Chat ---------- */
 function createAppButton() {
-  const appUrl = env('URL');
+  const appUrl = env('URL') || 'https://moneychill.netlify.app';
   if (!appUrl) return [];
   return [{
-    button: {
-      text: '🌐 เปิดแอปพลิเคชัน',
-      onClick: { openLink: { url: appUrl } }
-    }
+    text: '🌐 เปิดแอปพลิเคชัน',
+    onClick: { openLink: { url: appUrl } }
   }];
 }
 
 export function buildAlerts(S, ref, days, force = false) {
   const A = alerts(S, ref).filter(a => a.days <= days);
+  const buttons = createAppButton();
+  const btnWidget = buttons.length ? [{ buttonList: { buttons } }] : [];
+
   if (!A.length) {
     if (!force) return null;
     return {
@@ -105,7 +106,7 @@ export function buildAlerts(S, ref, days, force = false) {
         cardId: 'alert_empty',
         card: {
           header: { title: '🔔 แจ้งเตือนครบกำหนดชำระ', subtitle: `ข้อมูล ณ ${dLabel(ref)}` },
-          sections: [{ widgets: [{ textParagraph: { text: `✅ ไม่มีรายการครบกำหนดใน ${days} วันข้างหน้า` } }, { buttonList: { buttons: createAppButton() } }] }]
+          sections: [{ widgets: [{ textParagraph: { text: `✅ ไม่มีรายการครบกำหนดใน ${days} วันข้างหน้า` } }, ...btnWidget] }]
         }
       }]
     };
@@ -128,7 +129,7 @@ export function buildAlerts(S, ref, days, force = false) {
 
   widgets.push({ divider: {} });
   widgets.push({ textParagraph: { text: `💰 <b>รวมที่ต้องเตรียมทั้งหมด:</b> ${baht(sum(A))}` } });
-  widgets.push({ buttonList: { buttons: createAppButton() } });
+  if (buttons.length) widgets.push({ buttonList: { buttons } });
 
   return {
     cardsV2: [{
@@ -155,9 +156,11 @@ export function buildWeekly(S, ref) {
     { textParagraph: { text: `🎯 <b>งบผันผวนสัปดาห์:</b> ${baht(bud)}<br>ใช้ไป ${pct.toFixed(0)}% ${pct > 100 ? '⚠️ <b>(เกินงบ)</b>' : '✅ <b>(อยู่ในงบ)</b>'}` } },
     { textParagraph: { text: `🏷️ <b>หมวดที่ใช้มากสุด:</b><br>${topText}` } },
     { divider: {} },
-    { textParagraph: { text: `📆 <b>เดือน ${ymLabel(ymOf(ref))} ถึงวันนี้:</b><br>รับ ${baht(mtd.inc)} | จ่าย ${baht(mtd.exp)} | เหลือ <b>${baht(mtd.net)}</b><br>📌 ต้องจ่ายใน 7 วันนี้: ${next.length} รายการ (<b>${baht(sum(next))}</b>)` } },
-    { buttonList: { buttons: createAppButton() } }
+    { textParagraph: { text: `📆 <b>เดือน ${ymLabel(ymOf(ref))} ถึงวันนี้:</b><br>รับ ${baht(mtd.inc)} | จ่าย ${baht(mtd.exp)} | เหลือ <b>${baht(mtd.net)}</b><br>📌 ต้องจ่ายใน 7 วันนี้: ${next.length} รายการ (<b>${baht(sum(next))}</b>)` } }
   ];
+
+  const buttons = createAppButton();
+  if (buttons.length) widgets.push({ buttonList: { buttons } });
 
   return {
     cardsV2: [{
@@ -193,7 +196,8 @@ export function buildMonthly(S, ym, ref, partial = false) {
     widgets.push({ textParagraph: { text: `🎯 <b>เป้าหมายการออม:</b><br>${goalsText}` } });
   }
 
-  widgets.push({ buttonList: { buttons: createAppButton() } });
+  const buttons = createAppButton();
+  if (buttons.length) widgets.push({ buttonList: { buttons } });
 
   return {
     cardsV2: [{
