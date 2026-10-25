@@ -47,7 +47,9 @@
       --shadow-lg: 6px 6px 0 #18181b;
     }
 
-    * {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -55,7 +57,8 @@
 
     html,
     body {
-      max-width: 100vw;
+      width: 100%;
+      max-width: 100%;
       overflow-x: hidden;
       position: relative;
     }
@@ -333,6 +336,9 @@
       font-weight: 600;
       box-shadow: var(--shadow-sm);
       width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
       transition: all 0.15s ease;
     }
 
@@ -345,9 +351,58 @@
       box-shadow: 3px 3px 0 var(--blue-dark);
     }
 
+    /* WebKit & Mobile Safari Date / Month / Time inputs normalization */
+    input[type="date"],
+    input[type="month"],
+    input[type="time"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-color: #fff;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      display: block;
+      position: relative;
+      height: 42px;
+      min-height: 42px;
+      line-height: 1.3;
+      padding: 8px 12px;
+    }
+
+    /* iOS Safari internal date value container */
+    input[type="date"]::-webkit-date-and-time-value,
+    input[type="month"]::-webkit-date-and-time-value {
+      text-align: left;
+      min-height: 1.4em;
+      margin: 0;
+      padding: 0;
+      display: block;
+    }
+
+    #monthSel::-webkit-date-and-time-value {
+      text-align: center;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="month"]::-webkit-calendar-picker-indicator {
+      background-position: center;
+      cursor: pointer;
+      opacity: 0.85;
+      padding: 4px;
+      margin: 0 0 0 4px;
+    }
+
     .tools input {
       width: auto;
       border-radius: var(--rad-pill);
+    }
+
+    #monthSel {
+      text-align: center;
+      cursor: pointer;
+      font-weight: 700;
     }
 
     /* Buttons */
@@ -440,6 +495,8 @@
       padding: 20px;
       box-shadow: var(--shadow);
       min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
       position: relative;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
@@ -454,6 +511,7 @@
       gap: 8px;
       border-bottom: 2px solid #f1f5f9;
       padding-bottom: 10px;
+      word-break: break-word;
     }
 
     /* KPI Cards */
@@ -757,6 +815,8 @@
       max-width: 580px;
       max-height: 90vh;
       overflow-y: auto;
+      overflow-x: hidden;
+      box-sizing: border-box;
     }
 
     .modal-box h3 {
@@ -859,6 +919,17 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    #mForm label {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
     }
 
     #mForm label span {
@@ -869,6 +940,16 @@
       margin-bottom: 4px;
     }
 
+    #mForm input,
+    #mForm select,
+    #mForm textarea {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      box-sizing: border-box !important;
+      display: block;
+    }
+
     .full {
       grid-column: 1/-1;
     }
@@ -877,6 +958,9 @@
       display: flex;
       justify-content: flex-end;
       gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .hint {
@@ -1191,35 +1275,88 @@
 
       main {
         margin-left: 0 !important;
-        padding: 14px 12px 100px !important;
+        padding: 12px 10px 100px !important;
         width: 100% !important;
-        max-width: 100vw !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
         box-sizing: border-box !important;
       }
 
       .topbar {
-        padding: 12px 14px;
+        padding: 12px 12px;
         gap: 10px;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        box-shadow: 3px 3px 0 var(--border);
+        margin-bottom: 12px;
       }
 
       .topbar h1 {
         font-size: 18px;
+        word-break: break-word;
       }
 
       .tools {
         width: 100%;
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto;
         gap: 8px;
-        flex-wrap: wrap;
+        align-items: center;
+        box-sizing: border-box;
       }
 
-      .tools input {
-        flex: 1;
-        min-width: 120px;
+      .tools #monthSel {
+        grid-column: 1 / -1;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        text-align: center;
+        height: 42px;
+        margin: 0;
       }
 
-      .tools .btn {
-        flex: 0 0 auto;
+      .tools .btn.primary {
+        grid-column: 1 / 2;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        text-align: center;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+
+      .tools #sync {
+        grid-column: 2 / 3;
+        justify-self: end;
+        white-space: nowrap;
+        box-sizing: border-box;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 11px;
+        padding: 6px 10px;
+      }
+
+      .card {
+        padding: 14px 12px !important;
+        border-radius: 18px !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        box-shadow: 3px 3px 0 var(--border) !important;
+      }
+
+      .card h3 {
+        font-size: 15px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        word-break: break-word !important;
       }
 
       .grid {
@@ -1239,6 +1376,9 @@
 
       .kpi {
         padding: 12px 10px;
+        min-width: 0;
+        box-sizing: border-box;
+        overflow: hidden;
       }
 
       .kpi .lbl {
@@ -1247,7 +1387,8 @@
       }
 
       .kpi .val {
-        font-size: 19px;
+        font-size: 18px;
+        word-break: break-word;
       }
 
       .kpi .chg {
@@ -1255,16 +1396,32 @@
       }
 
       .chips {
-        gap: 6px;
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        margin-bottom: 12px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .chip {
-        padding: 6px 10px;
-        font-size: 12px;
+        padding: 8px 10px !important;
+        font-size: 11.5px !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
       }
 
       .chip b {
-        font-size: 14px;
+        font-size: 14px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      .chips > .chip:last-child:nth-child(odd) {
+        grid-column: span 2 !important;
       }
 
       .filters {
@@ -1276,9 +1433,13 @@
       .filters > * {
         width: 100% !important;
         min-width: 0 !important;
+        box-sizing: border-box !important;
       }
 
       .tbl {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
         max-height: 480px;
         -webkit-overflow-scrolling: touch;
       }
@@ -1325,9 +1486,13 @@
       }
 
       .modal-box {
-        padding: 16px 14px;
+        padding: 18px 14px;
         border-radius: 20px;
-        max-height: 85vh;
+        max-height: 88vh;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+        box-shadow: 4px 4px 0 var(--border);
       }
 
       .tbl-hint {
@@ -1351,6 +1516,26 @@
 
       #mForm {
         grid-template-columns: 1fr;
+        gap: 10px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      #mForm label {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+
+      #mForm input,
+      #mForm select,
+      #mForm textarea {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
       }
 
       /* Mobile Floating Action Button (FAB) */
@@ -1575,7 +1760,7 @@
       }
 
       .topbar {
-        padding: 10px 12px;
+        padding: 10px 10px;
       }
 
       .topbar h1 {
@@ -1583,14 +1768,30 @@
       }
 
       .tools {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr auto;
         gap: 6px;
         width: 100%;
+        box-sizing: border-box;
       }
 
-      .tools > * {
+      .tools #monthSel {
+        grid-column: 1 / -1;
         width: 100% !important;
+      }
+
+      .tools .btn.primary {
+        grid-column: 1 / 2;
+        width: 100% !important;
+        font-size: 12px;
+        padding: 7px 10px;
+      }
+
+      .tools #sync {
+        grid-column: 2 / 3;
+        width: auto !important;
+        font-size: 10px;
+        padding: 5px 8px;
       }
 
       .g6 {
@@ -1603,7 +1804,7 @@
       }
 
       .kpi .val {
-        font-size: 17px;
+        font-size: 16px;
       }
 
       th,
@@ -1679,7 +1880,10 @@
 
   <div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
     <div class="modal-box">
-      <h3 id="mTitle"></h3>
+      <div class="modal-box-header">
+        <h3 id="mTitle"></h3>
+        <button class="modal-box-close" type="button" onclick="closeModal()" title="ปิด">✕</button>
+      </div>
       <form id="mForm"></form>
     </div>
   </div>
