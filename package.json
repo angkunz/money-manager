@@ -1,0 +1,11 @@
+{
+  "name": "money-manager",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Money Manager application",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo \"No build step required\""
+  },
+  "dependencies": {}
+}

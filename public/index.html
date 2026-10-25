@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>บัญชีรายรับรายจ่าย</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #fff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --pri: #4f46e5;
+      --pri2: #7c3aed;
+      --inc: #10b981;
+      --exp: #f43f5e;
+      --rad: 16px;
+      --sh: 0 4px 20px rgba(15, 23, 42, .06)
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px
+    }
+
+    .sidebar {
+      width: 230px;
+      background: linear-gradient(180deg, #1e1b4b, #312e81);
+      color: #fff;
+      padding: 24px 14px;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 20
+    }
+
+    .brand {
+      font-size: 18px;
+      font-weight: 700;
+      padding: 0 10px 20px
+    }
+
+    .brand small {
+      display: block;
+      font-weight: 400;
+      opacity: .6;
+      font-size: 12px
+    }
+
+    #nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      color: #c7d2fe;
+      cursor: pointer;
+      border: 0;
+      background: none;
+      font: inherit;
+      text-align: left;
+      position: relative;
+      width: 100%
+    }
+
+    .nav:hover {
+      background: rgba(255, 255, 255, .08)
+    }
+
+    .nav.active {
+      background: rgba(255, 255, 255, .16);
+      color: #fff;
+      font-weight: 600
+    }
+
+    .nav .dot {
+      margin-left: auto;
+      background: var(--exp);
+      color: #fff;
+      border-radius: 99px;
+      font-size: 11px;
+      padding: 1px 7px
+    }
+
+    main {
+      margin-left: 230px;
+      padding: 24px 28px 80px;
+      min-width: 0
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px
+    }
+
+    .topbar h1 {
+      font-size: 22px
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .tools {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    input,
+    select,
+    textarea {
+      font: inherit;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      width: 100%
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 2px solid #c7d2fe;
+      border-color: var(--pri)
+    }
+
+    .tools input {
+      width: auto
+    }
+
+    .btn {
+      font: inherit;
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      background: #eef2ff;
+      color: var(--pri);
+      white-space: nowrap
+    }
+
+    .btn:hover {
+      filter: brightness(.97)
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--pri), var(--pri2));
+      color: #fff
+    }
+
+    .btn.ghost {
+      background: #f1f5f9;
+      color: var(--muted)
+    }
+
+    .btn.sm {
+      padding: 5px 10px;
+      font-size: 12px
+    }
+
+    .btn.danger {
+      background: #fff1f2;
+      color: var(--exp)
+    }
+
+    .btn.ok {
+      background: #dcfce7;
+      color: #15803d
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 16px
+    }
+
+    .g6 {
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr))
+    }
+
+    .g2 {
+      grid-template-columns: 2fr 1fr
+    }
+
+    .g11 {
+      grid-template-columns: 1fr 1fr
+    }
+
+    .g3 {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--rad);
+      padding: 18px;
+      box-shadow: var(--sh);
+      min-width: 0
+    }
+
+    .card h3 {
+      font-size: 15px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px
+    }
+
+    .kpi {
+      border-top: 4px solid var(--c, var(--pri))
+    }
+
+    .kpi .lbl {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .kpi .val {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 4px 0
+    }
+
+    .kpi .chg {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .up {
+      color: var(--inc) !important
+    }
+
+    .down {
+      color: var(--exp) !important
+    }
+
+    .chart {
+      position: relative;
+      height: 280px
+    }
+
+    .chart.sm {
+      height: 230px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    th,
+    td {
+      padding: 10px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap
+    }
+
+    th {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      background: #f8fafc;
+      position: sticky;
+      top: 0
+    }
+
+    .num {
+      text-align: right !important
+    }
+
+    tr:hover td {
+      background: #fafbff
+    }
+
+    tfoot td {
+      font-weight: 700;
+      background: #f8fafc
+    }
+
+    .tbl {
+      overflow: auto;
+      max-height: 560px
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    .b-red {
+      background: #ffe4e6;
+      color: #be123c
+    }
+
+    .b-orange {
+      background: #ffedd5;
+      color: #c2410c
+    }
+
+    .b-yellow {
+      background: #fef9c3;
+      color: #a16207
+    }
+
+    .b-green {
+      background: #dcfce7;
+      color: #15803d
+    }
+
+    .b-blue {
+      background: #e0e7ff;
+      color: #4338ca
+    }
+
+    .b-gray {
+      background: #f1f5f9;
+      color: #475569
+    }
+
+    .bar {
+      height: 8px;
+      background: #eef2f7;
+      border-radius: 99px;
+      overflow: hidden;
+      min-width: 80px
+    }
+
+    .bar>i {
+      display: block;
+      height: 100%;
+      border-radius: 99px;
+      background: var(--c, var(--pri))
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--line)
+    }
+
+    .item:last-child {
+      border: 0
+    }
+
+    .item .t {
+      flex: 1;
+      min-width: 0
+    }
+
+    .item small {
+      color: var(--muted);
+      display: block
+    }
+
+    .cc {
+      border-radius: 18px;
+      padding: 20px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--c1), var(--c2));
+      min-height: 170px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 10px 25px rgba(79, 70, 229, .25)
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+
+    .filters>* {
+      width: auto;
+      min-width: 130px
+    }
+
+    .chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+
+    .chip {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .chip b {
+      display: block;
+      font-size: 16px;
+      color: var(--text)
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 16px
+    }
+
+    .modal.show {
+      display: flex
+    }
+
+    .modal-box {
+      background: #fff;
+      border-radius: 18px;
+      padding: 22px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow: auto
+    }
+
+    .modal-box h3 {
+      margin-bottom: 14px
+    }
+
+    #mForm {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    #mForm label span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px
+    }
+
+    .full {
+      grid-column: 1/-1
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translate(-50%, 120px);
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      transition: .3s;
+      z-index: 60
+    }
+
+    #toast.show {
+      transform: translate(-50%, 0)
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px
+    }
+
+    .tabs .btn {
+      background: #fff;
+      color: var(--muted);
+      box-shadow: var(--sh)
+    }
+
+    .tabs .btn.on {
+      background: var(--pri);
+      color: #fff
+    }
+
+    .tip {
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 13px
+    }
+
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 24px
+    }
+
+    .set-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px
+    }
+
+    .set-grid label span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px
+    }
+
+    @media(max-width:1000px) {
+
+      .g2,
+      .g11 {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:760px) {
+      .sidebar {
+        top: auto;
+        width: 100%;
+        height: 66px;
+        padding: 6px;
+        flex-direction: row
+      }
+
+      .brand {
+        display: none
+      }
+
+      #nav {
+        flex-direction: row;
+        overflow-x: auto;
+        width: 100%
+      }
+
+      .nav {
+        flex-direction: column;
+        gap: 2px;
+        font-size: 10px;
+        padding: 6px 8px;
+        min-width: 68px;
+        text-align: center
+      }
+
+      .nav .dot {
+        position: absolute;
+        top: 2px;
+        right: 6px
+      }
+
+      main {
+        margin-left: 0;
+        padding: 16px 14px 90px
+      }
+
+      #mForm {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="brand">💰 Money Manager<small>บัญชีรายรับรายจ่ายส่วนตัว</small></div>
+    <div id="nav"></div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle"></h1>
+        <div class="sub" id="refInfo"></div>
+      </div>
+      <div class="tools"><span id="sync" class="badge b-gray">ออฟไลน์</span>
+    </header>
+    <div id="content"></div>
+  </main>
+  <div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+    <div class="modal-box">
+      <h3 id="mTitle"></h3>
+      <form id="mForm"></form>
+    </div>
+  </div>
+  <div id="toast"></div>
+
+  <script>
+    /* ================= UTILITIES ================= */
+    const $ = s => document.querySelector(s);
+    const TH_M = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    const PAL = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#06b6d4', '#8b5cf6', '#ef4444', '#84cc16', '#f97316', '#14b8a6', '#a855f7', '#64748b', '#eab308', '#0ea5e9'];
+    const GROUP = { 'ออมและลงทุน': 'save', 'ช้อปปิ้ง': 'want', 'บันเทิง': 'want', 'สมาชิกรายเดือน': 'want' };
+    const FREQ = ['รายวัน', 'รายสัปดาห์', 'รายเดือน', 'รายครั้ง'];
+    const fmt = n => (Math.round(n) || 0).toLocaleString('th-TH');
+    const baht = n => '฿' + fmt(n);
+    const kfmt = v => Math.abs(v) >= 1000 ? (v / 1000).toLocaleString('th-TH', { maximumFractionDigits: 1 }) + 'k' : v;
+    const uid = () => Math.random().toString(36).slice(2, 10);
+    const pad = n => String(n).padStart(2, '0');
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const parse = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d || 1) };
+    const ymOf = s => s.slice(0, 7);
+    const dim = (y, m) => new Date(y, m, 0).getDate();
+    const addYM = (ym, k) => { const [y, m] = ym.split('-').map(Number); const d = new Date(y, m - 1 + k, 1); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}` };
+    const dateIn = (ym, day) => { const [y, m] = ym.split('-').map(Number); return `${ym}-${pad(Math.min(+day, dim(y, m)))}` };
+    const addMD = (s, k) => dateIn(addYM(ymOf(s), k), +s.slice(8, 10));
+    const diffDays = (a, b) => Math.round((parse(a) - parse(b)) / 864e5);
+    const ymLabel = ym => { const [y, m] = ym.split('-').map(Number); return `${TH_M[m - 1]} ${y + 543}` };
+    const ymShort = ym => { const [y, m] = ym.split('-').map(Number); return `${TH_M[m - 1]} ${String(y + 543).slice(2)}` };
+    const dLabel = s => { if (!s) return '-'; const d = parse(s); return `${d.getDate()} ${TH_M[d.getMonth()]} ${String(d.getFullYear() + 543).slice(2)}` };
+    const sum = (a, f = x => x.amount) => a.reduce((s, x) => s + (+f(x) || 0), 0);
+    function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200) }
+
+    /* ================= DATA ================= */
+    const KEY = 'money-manager-v1', AUTH = 'money-key', CLOUD = location.protocol.startsWith('http');
+    let S = load(), REV = +localStorage.getItem(KEY + '-rev') || 0, saveT = null;
+    function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.tx) return s } catch (e) { } return sample() }
+    const dirty = v => v === undefined ? localStorage.getItem(KEY + '-dirty') === '1' : localStorage.setItem(KEY + '-dirty', v ? '1' : '0');
+    function setSync(t, c) { const e = $('#sync'); if (e) { e.textContent = t; e.className = 'badge ' + c } }
+    function save() {
+      localStorage.setItem(KEY, JSON.stringify(S)); dirty(true);
+      if (!CLOUD || !localStorage.getItem(AUTH)) return;
+      setSync('⏳ กำลังบันทึก...', 'b-yellow'); clearTimeout(saveT); saveT = setTimeout(push, 800);
+    }
+    async function api(path, opt = {}) {
+      const r = await fetch('/api/' + path, { ...opt, headers: { 'content-type': 'application/json', 'x-app-key': localStorage.getItem(AUTH) || '' } });
+      if (r.status === 401) { localStorage.removeItem(AUTH); askKey(); throw new Error('auth') }
+      return r;
+    }
+    async function push(force) {
+      saveT = null;
+      try {
+        const r = await api('data', { method: 'PUT', body: JSON.stringify({ rev: force ? null : REV, data: S }) });
+        if (r.status === 409) {
+          const j = await r.json();
+          if (confirm('ข้อมูลบนคลาวด์ถูกแก้ไขจากอุปกรณ์อื่น\nตกลง = โหลดข้อมูลล่าสุดจากคลาวด์\nยกเลิก = ใช้ข้อมูลในเครื่องนี้เขียนทับ')) applyRemote(j); else await push(true); return
+        }
+        if (!r.ok) throw new Error(r.status);
+        const j = await r.json(); REV = j.rev; localStorage.setItem(KEY + '-rev', REV); dirty(false); setSync('☁️ ซิงก์แล้ว', 'b-green');
+      } catch (e) { if (e.message !== 'auth') setSync('⚠️ ออฟไลน์ (บันทึกในเครื่อง)', 'b-red') }
+    }
+    function applyRemote(j) { S = j.data; REV = j.rev; localStorage.setItem(KEY, JSON.stringify(S)); localStorage.setItem(KEY + '-rev', REV); dirty(false); render(); setSync('☁️ ซิงก์แล้ว', 'b-green') }
+    async function pull() {
+      if (!CLOUD) return setSync('📴 โหมดออฟไลน์', 'b-gray');
+      if (!localStorage.getItem(AUTH)) return askKey();
+      setSync('⏳ กำลังโหลด...', 'b-yellow');
+      try {
+        const r = await api('data');
+        if (r.status === 404) { await push(true); toast('อัปโหลดข้อมูลขึ้นคลาวด์ครั้งแรกแล้ว'); return }
+        if (!r.ok) throw new Error(r.status);
+        const j = await r.json();
+        if (dirty()) {
+          if (j.rev === REV) return push();
+          if (confirm('มีการแก้ไขในเครื่องนี้ที่ยังไม่ซิงก์ และบนคลาวด์ก็มีการแก้ไขด้วย\nตกลง = ใช้ข้อมูลบนคลาวด์\nยกเลิก = ใช้ข้อมูลในเครื่องนี้เขียนทับ')) applyRemote(j); else push(true); return
+        }
+        if (j.rev !== REV) applyRemote(j); else setSync('☁️ ซิงก์แล้ว', 'b-green');
+      } catch (e) { if (e.message !== 'auth') setSync('⚠️ ออฟไลน์ (บันทึกในเครื่อง)', 'b-red') }
+    }
+    function askKey() {
+      if (!CLOUD) return;
+      $('#mTitle').textContent = '🔐 เข้าสู่ระบบ';
+      $('#mForm').innerHTML = `<label class="full"><span>รหัสผ่านแอป (APP_PIN ที่ตั้งไว้ใน Netlify)</span><input name="k" type="password" required autofocus></label>
+ <div class="actions full"><button type="button" class="btn ghost" onclick="closeModal();setSync('📴 ใช้แบบออฟไลน์','b-gray')">ใช้แบบออฟไลน์</button><button class="btn primary">เข้าสู่ระบบ</button></div>`;
+      $('#mForm').onsubmit = e => { e.preventDefault(); localStorage.setItem(AUTH, $('#mForm').k.value.trim()); closeModal(); pull() };
+      $('#modal').classList.add('show');
+    }
+    function logout() { localStorage.removeItem(AUTH); setSync('📴 ออกจากระบบแล้ว', 'b-gray'); askKey() }
+    const today = () => S.settings.refDate || ymd(new Date());
+    const methods = () => ['เงินสด', 'โอน', ...S.cards.map(c => c.name)];
+
+    function sample() {
+      const tx = []; const T = (date, type, nature, category, desc, freq, method, amount, note = '') => tx.push({ id: uid(), date, type, nature, category, desc, freq, method, amount, note });
+      [['2026-07', 7000, 1000, 0, [8000, 3000, 1500, 1700, 0]], ['2026-08', 9500, 998, 419, [8500, 3200, 1600, 2000, 1500]], ['2026-09', 11000, 998, 419, [7500, 2500, 1350, 3750, 0]]]
+        .forEach(([ym, side, comm, subs, v]) => {
+          T(ym + '-01', 'รายรับ', '-', 'เงินเดือน', 'เงินเดือนประจำ', 'รายเดือน', 'โอน', 35000);
+          T(ym + '-28', 'รายรับ', '-', 'ขายของออนไลน์', 'ยอดขายรวมทั้งเดือน', 'รายเดือน', 'โอน', side, 'ข้อมูลย้อนหลัง');
+          T(ym + '-01', 'รายจ่าย', 'คงที่', 'ที่พัก', 'ค่าเช่าห้อง', 'รายเดือน', 'โอน', 7000);
+          T(ym + '-01', 'รายจ่าย', 'คงที่', 'ออมและลงทุน', 'DCA กองทุนรวม', 'รายเดือน', 'โอน', 5000);
+          T(ym + '-05', 'รายจ่าย', 'คงที่', 'สื่อสาร', 'ค่าเน็ตและโทรศัพท์', 'รายเดือน', 'โอน', comm);
+          T(ym + '-10', 'รายจ่าย', 'คงที่', 'ประกัน', 'เบี้ยประกันชีวิต', 'รายเดือน', 'โอน', 2000);
+          if (subs) T(ym + '-25', 'รายจ่าย', 'คงที่', 'สมาชิกรายเดือน', 'Netflix และ Spotify', 'รายเดือน', 'โอน', subs);
+          ['อาหาร', 'เดินทาง', 'สาธารณูปโภค', 'ช้อปปิ้ง', 'บันเทิง'].forEach((c, i) => {
+            if (!v[i]) return; const sp = ym === '2026-09' && i === 3;
+            T(ym + (sp ? '-30' : '-15'), 'รายจ่าย', 'ผันผวน', c, 'ยอดรวม' + c + 'ทั้งเดือน', 'รายเดือน', sp ? 'บัตร A' : 'เงินสด', v[i], 'ข้อมูลย้อนหลัง')
+          });
+        });
+      [['01', 'รายรับ', '-', 'เงินเดือน', 'เงินเดือนประจำ', 'รายเดือน', 'โอน', 35000],
+      ['01', 'รายจ่าย', 'คงที่', 'ที่พัก', 'ค่าเช่าห้อง', 'รายเดือน', 'โอน', 7000],
+      ['01', 'รายจ่าย', 'คงที่', 'ออมและลงทุน', 'DCA กองทุนรวม', 'รายเดือน', 'โอน', 5000, 'ตัดบัญชีอัตโนมัติ'],
+      ['03', 'รายจ่าย', 'ผันผวน', 'อาหาร', 'ซื้อของเข้าบ้าน ซูเปอร์มาร์เก็ต', 'รายครั้ง', 'บัตร A', 1200],
+      ['04', 'รายจ่าย', 'ผันผวน', 'อาหาร', 'ค่าอาหารสัปดาห์ที่ 1', 'รายสัปดาห์', 'เงินสด', 1500, 'บันทึกรวมทั้งสัปดาห์'],
+      ['05', 'รายรับ', '-', 'ขายของออนไลน์', 'ยอดขายสัปดาห์ที่ 1', 'รายสัปดาห์', 'โอน', 2500],
+      ['05', 'รายจ่าย', 'คงที่', 'สื่อสาร', 'ค่าอินเทอร์เน็ตบ้าน', 'รายเดือน', 'โอน', 599],
+      ['05', 'รายจ่าย', 'คงที่', 'สื่อสาร', 'ค่าโทรศัพท์มือถือ', 'รายเดือน', 'โอน', 399],
+      ['06', 'รายจ่าย', 'ผันผวน', 'เดินทาง', 'เติมน้ำมัน', 'รายครั้ง', 'บัตร B', 1000],
+      ['08', 'รายจ่าย', 'ผันผวน', 'ช้อปปิ้ง', 'เสื้อผ้า', 'รายครั้ง', 'บัตร A', 1290],
+      ['10', 'รายจ่าย', 'คงที่', 'ประกัน', 'เบี้ยประกันชีวิต', 'รายเดือน', 'โอน', 2000],
+      ['11', 'รายจ่าย', 'ผันผวน', 'อาหาร', 'ค่าอาหารสัปดาห์ที่ 2', 'รายสัปดาห์', 'เงินสด', 1650],
+      ['12', 'รายรับ', '-', 'ขายของออนไลน์', 'ยอดขายสัปดาห์ที่ 2', 'รายสัปดาห์', 'โอน', 3000],
+      ['13', 'รายจ่าย', 'ผันผวน', 'เดินทาง', 'เติมบัตร BTS/MRT', 'รายครั้ง', 'โอน', 600],
+      ['14', 'รายจ่าย', 'ผันผวน', 'สุขภาพ', 'ค่ายา', 'รายครั้ง', 'เงินสด', 450],
+      ['15', 'รายรับ', '-', 'ฟรีแลนซ์', 'งานออกแบบโลโก้', 'รายครั้ง', 'โอน', 5000],
+      ['15', 'รายจ่าย', 'ผันผวน', 'สาธารณูปโภค', 'ค่าไฟฟ้า', 'รายเดือน', 'โอน', 1250],
+      ['15', 'รายจ่าย', 'ผันผวน', 'สาธารณูปโภค', 'ค่าน้ำประปา', 'รายเดือน', 'โอน', 180],
+      ['18', 'รายจ่าย', 'ผันผวน', 'อาหาร', 'ค่าอาหารสัปดาห์ที่ 3', 'รายสัปดาห์', 'เงินสด', 1800],
+      ['19', 'รายรับ', '-', 'ขายของออนไลน์', 'ยอดขายสัปดาห์ที่ 3', 'รายสัปดาห์', 'โอน', 2800],
+      ['19', 'รายจ่าย', 'ผันผวน', 'บันเทิง', 'ดูหนัง', 'รายครั้ง', 'บัตร B', 520],
+      ['20', 'รายรับ', '-', 'ดอกเบี้ยและปันผล', 'ดอกเบี้ยเงินฝาก', 'รายเดือน', 'โอน', 200],
+      ['20', 'รายจ่าย', 'ผันผวน', 'เดินทาง', 'เติมน้ำมัน', 'รายครั้ง', 'บัตร B', 1000],
+      ['22', 'รายจ่าย', 'ผันผวน', 'ของใช้ในบ้าน', 'ผงซักฟอกและของใช้', 'รายครั้ง', 'เงินสด', 680],
+      ['24', 'รายจ่าย', 'ผันผวน', 'บันเทิง', 'สังสรรค์กับเพื่อน', 'รายครั้ง', 'บัตร A', 1200],
+      ['25', 'รายจ่าย', 'ผันผวน', 'อาหาร', 'ค่าอาหารสัปดาห์ที่ 4', 'รายสัปดาห์', 'เงินสด', 1400],
+      ['25', 'รายจ่าย', 'คงที่', 'สมาชิกรายเดือน', 'Netflix และ Spotify', 'รายเดือน', 'บัตร A', 419, 'ตัดบัตรอัตโนมัติ']
+      ].forEach(r => T('2026-10-' + r[0], ...r.slice(1)));
+      const P = ['2026-10'];
+      return {
+        settings: {
+          opening: 20000, startMonth: '2026-07', refDate: '2026-10-25', varBudget: 16000,
+          cats: {
+            income: ['เงินเดือน', 'โบนัส', 'ขายของออนไลน์', 'ฟรีแลนซ์', 'ดอกเบี้ยและปันผล', 'รายรับอื่นๆ'],
+            expense: ['ที่พัก', 'อาหาร', 'เดินทาง', 'สาธารณูปโภค', 'สื่อสาร', 'ประกัน', 'สุขภาพ', 'ของใช้ในบ้าน', 'ช้อปปิ้ง', 'บันเทิง', 'สมาชิกรายเดือน', 'การศึกษา', 'ออมและลงทุน', 'อื่นๆ']
+          },
+          budgets: { 'ที่พัก': 7000, 'อาหาร': 8000, 'เดินทาง': 3000, 'สาธารณูปโภค': 1500, 'สื่อสาร': 1000, 'ประกัน': 2000, 'สุขภาพ': 1000, 'ของใช้ในบ้าน': 1000, 'ช้อปปิ้ง': 2000, 'บันเทิง': 1500, 'สมาชิกรายเดือน': 500, 'การศึกษา': 0, 'ออมและลงทุน': 5000, 'อื่นๆ': 1000 }
+        },
+        tx,
+        cards: [{ id: uid(), name: 'บัตร A', limit: 50000, cutoff: 31, due: 25, paidUntil: '2026-09-25' }, { id: uid(), name: 'บัตร B', limit: 30000, cutoff: 20, due: 5, paidUntil: '2026-10-05' }],
+        inst: [{ id: uid(), date: '2026-05-10', item: 'iPhone', card: 'บัตร A', principal: 36000, months: 10, rate: 0, firstDue: '2026-06-25' },
+        { id: uid(), date: '2026-08-15', item: 'เครื่องซักผ้า', card: 'บัตร B', principal: 15900, months: 6, rate: 0, firstDue: '2026-09-05' },
+        { id: uid(), date: '2026-10-08', item: 'คอร์สเรียนออนไลน์', card: 'บัตร A', principal: 12000, months: 4, rate: 0.8, firstDue: '2026-11-25' },
+        { id: uid(), date: '2026-03-20', item: 'ตั๋วเครื่องบิน', card: 'บัตร B', principal: 9000, months: 6, rate: 0, firstDue: '2026-04-05' }],
+        bills: [['ค่าเช่าห้อง', 'ที่พัก', 'คงที่', 7000, 1, P], ['DCA กองทุนรวม', 'ออมและลงทุน', 'คงที่', 5000, 1, P], ['ค่าอินเทอร์เน็ตบ้าน', 'สื่อสาร', 'คงที่', 599, 5, P],
+        ['ค่าโทรศัพท์มือถือ', 'สื่อสาร', 'คงที่', 399, 5, P], ['เบี้ยประกันชีวิต', 'ประกัน', 'คงที่', 2000, 10, P], ['ค่าไฟฟ้า (ประมาณ)', 'สาธารณูปโภค', 'ผันผวน', 1250, 15, P],
+        ['ค่าน้ำประปา (ประมาณ)', 'สาธารณูปโภค', 'ผันผวน', 180, 15, P], ['ค่าส่วนกลางคอนโด', 'ที่พัก', 'คงที่', 500, 20, []], ['Netflix และ Spotify', 'สมาชิกรายเดือน', 'คงที่', 419, 25, P, 'ใช่']]
+          .map(([name, category, nature, amount, day, paid, auto = 'ไม่ใช่']) => ({ id: uid(), name, category, nature, amount, day, paid: [...paid], auto })),
+        goals: [{ id: uid(), name: 'เงินสำรองฉุกเฉิน 6 เดือน', target: 180000, saved: 60000, deadline: '2027-12-31' },
+        { id: uid(), name: 'เที่ยวญี่ปุ่น', target: 50000, saved: 18000, deadline: '2027-04-30' },
+        { id: uid(), name: 'เงินดาวน์รถ', target: 100000, saved: 15000, deadline: '2028-06-30' }]
+      };
+    }
+
+    /* ================= CALCULATIONS ================= */
+    function instCalc(i) {
+      const total = Math.round(i.principal * (1 + (+i.rate || 0) / 100 * i.months)), per = Math.round(total / i.months), ref = today(), dues = [];
+      for (let k = 0; k < i.months; k++)dues.push({ date: addMD(i.firstDue, k), amount: k === i.months - 1 ? total - per * (i.months - 1) : per, k });
+      const done = dues.filter(d => d.date <= ref).length, paid = sum(dues.slice(0, done));
+      return {
+        ...i, total, per, dues, done, paid, remain: total - paid, left: i.months - done, next: dues[done]?.date || null, last: dues.at(-1).date,
+        status: done === 0 ? 'ยังไม่เริ่มผ่อน' : done >= i.months ? 'ผ่อนครบแล้ว' : 'กำลังผ่อน'
+      };
+    }
+    const instDues = () => S.inst.flatMap(i => instCalc(i).dues.map(d => ({ ...d, card: i.card, item: i.item, iid: i.id })));
+    const instInMonth = (ym, card) => sum(instDues().filter(d => ymOf(d.date) === ym && (!card || d.card === card)));
+
+    function monthAgg(ym) {
+      let inc = 0, fix = 0, vari = 0;
+      S.tx.forEach(t => { if (ymOf(t.date) !== ym) return; if (t.type === 'รายรับ') inc += t.amount; else if (t.nature === 'คงที่') fix += t.amount; else vari += t.amount });
+      const inst = instInMonth(ym), exp = fix + vari + inst, net = inc - exp;
+      return { ym, inc, fix, vari, inst, exp, net, rate: inc ? net / inc * 100 : 0 };
+    }
+    function ledger(until) {
+      const out = []; let bal = +S.settings.opening || 0, ym = S.settings.startMonth, g = 0;
+      while (ym <= until && g++ < 240) { const a = monthAgg(ym); a.open = bal; bal += a.net; a.close = bal; out.push(a); ym = addYM(ym, 1) }
+      return out;
+    }
+    function ledgerTo(ym) {
+      const L = ledger(ym);
+      if (!L.length) { const a = monthAgg(ym); a.open = 0; a.close = a.net; return { list: [a], cur: a, prev: null } }
+      return { list: L, cur: L.at(-1), prev: L.at(-2) || null };
+    }
+    function forecast(ym, list) {
+      const last = list.slice(-3), avg = k => last.reduce((s, x) => s + x[k], 0) / (last.length || 1);
+      const a = { ym, inc: Math.round(avg('inc')), fix: last.at(-1)?.fix || 0, vari: Math.round(avg('vari')), inst: instInMonth(ym), fc: true };
+      a.exp = a.fix + a.vari + a.inst; a.net = a.inc - a.exp; a.rate = a.inc ? a.net / a.inc * 100 : 0; a.open = list.at(-1)?.close || 0; a.close = a.open + a.net; return a;
+    }
+    function catSpend(ym) { const m = {}; S.tx.forEach(t => { if (t.type === 'รายจ่าย' && ymOf(t.date) === ym) m[t.category] = (m[t.category] || 0) + t.amount }); return m }
+
+    function stmtDue(c, date) {
+      const ym = ymOf(date); let cut = dateIn(ym, c.cutoff); if (date > cut) cut = dateIn(addYM(ym, 1), c.cutoff);
+      const cym = ymOf(cut); let due = dateIn(cym, c.due); if (due <= cut) due = dateIn(addYM(cym, 1), c.due); return due;
+    }
+    function cardPays(c) {
+      const m = {}, add = (due, k, v) => { if (c.paidUntil && due <= c.paidUntil) return; (m[due] = m[due] || { due, full: 0, inst: 0 })[k] += v };
+      S.tx.forEach(t => { if (t.type === 'รายจ่าย' && t.method === c.name) add(stmtDue(c, t.date), 'full', t.amount) });
+      instDues().forEach(d => { if (d.card === c.name) add(d.date, 'inst', d.amount) });
+      return Object.values(m).sort((a, b) => a.due < b.due ? -1 : 1);
+    }
+    function cardSum(c) {
+      const p = cardPays(c), used = p.reduce((s, x) => s + x.full + x.inst, 0);
+      return { pays: p, next: p[0] || null, used, util: c.limit ? used / c.limit * 100 : 0, debt: sum(S.inst.filter(i => i.card === c.name).map(instCalc), i => i.remain) };
+    }
+    function stat(days) {
+      if (days < 0) return ['b-red', `เกินกำหนด ${-days} วัน`]; if (days === 0) return ['b-orange', 'ครบกำหนดวันนี้'];
+      if (days <= 7) return ['b-yellow', `ใกล้ครบ: อีก ${days} วัน`]; return ['b-green', `อีก ${days} วัน`];
+    }
+    function alerts() {
+      const ref = today(), out = [];
+      S.bills.forEach(b => {
+        let ym = ymOf(ref); if (b.paid.includes(ym)) ym = addYM(ym, 1); const due = dateIn(ym, b.day);
+        out.push({ kind: 'bill', id: b.id, ym, name: b.name, type: b.nature, amount: b.amount, due, days: diffDays(due, ref), auto: b.auto === 'ใช่' })
+      });
+      S.cards.forEach((c, ci) => cardPays(c).forEach((p, i) => {
+        const days = diffDays(p.due, ref);
+        if (i === 0 || days <= 35) out.push({ kind: 'card', ci, first: i === 0, name: `ชำระ${c.name} (รอบ ${dLabel(p.due)})`, type: 'บัตรเครดิต', amount: p.full + p.inst, due: p.due, days, detail: `รูดเต็ม ${baht(p.full)} + ผ่อน ${baht(p.inst)}` })
+      }));
+      return out.sort((a, b) => a.days - b.days);
+    }
+    function weeks(ym) {
+      const [y, m] = ym.split('-').map(Number), n = dim(y, m), W = [];
+      for (let w = 1; w <= Math.ceil(n / 7); w++)W.push({ w, s: (w - 1) * 7 + 1, e: Math.min(w * 7, n), inc: 0, fix: 0, vari: 0, inst: 0, cats: {} });
+      const wk = d => W[Math.ceil(+d.slice(8, 10) / 7) - 1];
+      S.tx.filter(t => ymOf(t.date) === ym).forEach(t => { const x = wk(t.date); if (t.type === 'รายรับ') x.inc += t.amount; else { t.nature === 'คงที่' ? x.fix += t.amount : x.vari += t.amount; x.cats[t.category] = (x.cats[t.category] || 0) + t.amount } });
+      instDues().filter(d => ymOf(d.date) === ym).forEach(d => wk(d.date).inst += d.amount);
+      W.forEach(x => { x.budget = S.settings.varBudget / n * (x.e - x.s + 1); x.exp = x.fix + x.vari + x.inst; x.net = x.inc - x.exp; x.top = Object.entries(x.cats).sort((a, b) => b[1] - a[1])[0]?.[0] || '-' });
+      return W;
+    }
+
+    /* ================= CHARTS ================= */
+    const charts = {};
+    if (window.Chart) {
+      Chart.defaults.font.family = "'IBM Plex Sans Thai',sans-serif"; Chart.defaults.color = '#64748b'; Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.plugins.legend.labels.usePointStyle = true; Chart.defaults.plugins.legend.labels.boxWidth = 8;
+      Chart.defaults.plugins.tooltip.callbacks.label = c => { const v = typeof c.parsed === 'object' ? (c.chart.options.indexAxis === 'y' ? c.parsed.x : c.parsed.y) : c.parsed; return ` ${c.dataset.label || c.label}: ${baht(v)}` };
+    }
+    function mk(id, cfg) { if (!window.Chart) return; const el = document.getElementById(id); if (el) charts[id] = new Chart(el, cfg) }
+    const yK = { ticks: { callback: kfmt }, grid: { color: '#f1f5f9' } };
+
+    /* ================= FORM / MODAL ================= */
+    function openForm(title, fields, data, onSave, after) {
+      $('#mTitle').textContent = title;
+      $('#mForm').innerHTML = fields.map(f => `<label class="${f.full ? 'full' : ''}"><span>${f.label}</span>${inp(f, data[f.key])}${f.hint ? `<div class="hint">${f.hint}</div>` : ''}</label>`).join('')
+        + `<div class="actions full"><button type="button" class="btn ghost" onclick="closeModal()">ยกเลิก</button><button class="btn primary">บันทึก</button></div>`;
+      $('#mForm').onsubmit = e => {
+        e.preventDefault(); const o = { ...data }, el = $('#mForm').elements;
+        fields.forEach(f => o[f.key] = f.type === 'number' ? (parseFloat(el[f.key].value) || 0) : el[f.key].value.trim());
+        onSave(o); save(); closeModal(); render(); toast('บันทึกเรียบร้อย')
+      };
+      $('#modal').classList.add('show'); after && after();
+    }
+    function inp(f, v) {
+      v = v ?? f.def ?? '';
+      if (f.type === 'select') return `<select name="${f.key}">${f.options.map(o => `<option ${o == v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+      return `<input name="${f.key}" type="${f.type || 'text'}" value="${esc(v)}" ${f.req ? 'required' : ''} ${f.type === 'number' ? 'step="any"' : ''} ${f.min != null ? `min="${f.min}"` : ''} ${f.max != null ? `max="${f.max}"` : ''}>`;
+    }
+    function closeModal() { $('#modal').classList.remove('show') }
+    const upsert = (arr, o) => { if (o.id) { const i = arr.findIndex(x => x.id === o.id); arr[i] = o } else { o.id = uid(); arr.push(o) } };
+    function del(arr, id, label) { if (!confirm(`ลบ "${label}" ใช่หรือไม่?`)) return; S[arr] = S[arr].filter(x => x.id !== id); save(); render(); toast('ลบแล้ว') }
+
+    /* ================= TRANSACTIONS ================= */
+    function txForm(id) {
+      const t = S.tx.find(x => x.id === id) || { date: today(), type: 'รายจ่าย', nature: 'ผันผวน', freq: 'รายครั้ง', method: 'เงินสด' };
+      openForm(id ? 'แก้ไขรายการ' : 'บันทึกรายการใหม่', [
+        { key: 'date', label: 'วันที่', type: 'date', req: 1 }, { key: 'type', label: 'ประเภท', type: 'select', options: ['รายรับ', 'รายจ่าย'] },
+        { key: 'nature', label: 'ลักษณะรายจ่าย', type: 'select', options: ['คงที่', 'ผันผวน'] }, { key: 'category', label: 'หมวดหมู่', type: 'select', options: [] },
+        { key: 'amount', label: 'จำนวนเงิน (บาท)', type: 'number', req: 1, min: 0 }, { key: 'freq', label: 'ความถี่', type: 'select', options: FREQ, hint: 'รายสัปดาห์/รายเดือน = บันทึกยอดรวมก้อนเดียว' },
+        { key: 'method', label: 'ช่องทางชำระ', type: 'select', options: methods(), hint: 'รูดบัตรแบบจ่ายเต็มเลือกชื่อบัตร' }, { key: 'desc', label: 'รายละเอียด', req: 1 },
+        { key: 'note', label: 'หมายเหตุ', full: 1 }], t,
+        o => { if (o.type === 'รายรับ') o.nature = '-'; upsert(S.tx, o) },
+        () => {
+          const f = $('#mForm'); const sync = () => {
+            const inc = f.type.value === 'รายรับ'; const list = S.settings.cats[inc ? 'income' : 'expense'];
+            f.category.innerHTML = list.map(c => `<option ${c === t.category ? 'selected' : ''}>${esc(c)}</option>`).join(''); f.nature.disabled = inc
+          };
+          f.type.onchange = sync; sync()
+        });
+    }
+    let txF = { type: '', nature: '', cat: '', q: '', all: false };
+    function pgTx() {
+      const q = txF.q.toLowerCase();
+      const L = S.tx.filter(t => (txF.all || ymOf(t.date) === curYM) && (!txF.type || t.type === txF.type) && (!txF.nature || t.nature === txF.nature) && (!txF.cat || t.category === txF.cat) && (!q || (t.desc + t.note + t.category).toLowerCase().includes(q))).sort((a, b) => b.date.localeCompare(a.date));
+      const inc = sum(L.filter(t => t.type === 'รายรับ')), exp = sum(L.filter(t => t.type === 'รายจ่าย')), cats = [...S.settings.cats.income, ...S.settings.cats.expense];
+      const sel = (k, opts, ph) => `<select onchange="txF.${k}=this.value;render()"><option value="">${ph}</option>${opts.map(o => `<option ${txF[k] === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+      return {
+        html: `<div class="card">
+ <div class="filters">${sel('type', ['รายรับ', 'รายจ่าย'], 'ทุกประเภท')}${sel('nature', ['คงที่', 'ผันผวน'], 'ทุกลักษณะ')}${sel('cat', cats, 'ทุกหมวดหมู่')}
+ <input placeholder="🔍 ค้นหา..." value="${esc(txF.q)}" onchange="txF.q=this.value;render()">
+ <label class="chip" style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" style="width:auto" ${txF.all ? 'checked' : ''} onchange="txF.all=this.checked;render()">แสดงทุกเดือน</label></div>
+ <div class="chips"><div class="chip">รายการ<b>${L.length}</b></div><div class="chip">รายรับ<b class="up">${baht(inc)}</b></div><div class="chip">รายจ่าย (ไม่รวมผ่อน)<b class="down">${baht(exp)}</b></div>
+ <div class="chip">ผ่อนบัตรเดือนนี้ (ดึงอัตโนมัติ)<b>${baht(instInMonth(curYM))}</b></div></div>
+ <div class="tbl"><table><thead><tr><th>วันที่</th><th>ประเภท</th><th>ลักษณะ</th><th>หมวดหมู่</th><th>รายละเอียด</th><th>ความถี่</th><th>ช่องทาง</th><th class="num">จำนวนเงิน</th><th>หมายเหตุ</th><th></th></tr></thead><tbody>
+ ${L.map(t => `<tr><td>${dLabel(t.date)}</td><td><span class="badge ${t.type === 'รายรับ' ? 'b-green' : 'b-red'}">${t.type}</span></td><td>${t.nature === '-' ? '-' : `<span class="badge ${t.nature === 'คงที่' ? 'b-blue' : 'b-yellow'}">${t.nature}</span>`}</td>
+ <td>${esc(t.category)}</td><td>${esc(t.desc)}</td><td>${t.freq}</td><td>${esc(t.method)}</td><td class="num ${t.type === 'รายรับ' ? 'up' : 'down'}"><b>${t.type === 'รายรับ' ? '+' : '-'}${fmt(t.amount)}</b></td><td class="hint">${esc(t.note)}</td>
+ <td><button class="btn sm" onclick="txForm('${t.id}')">แก้ไข</button> <button class="btn sm danger" onclick="del('tx','${t.id}','${esc(t.desc)}')">ลบ</button></td></tr>`).join('') || `<tr><td colspan="10" class="empty">ยังไม่มีรายการ</td></tr>`}
+ </tbody></table></div></div>`};
+    }
+
+    /* ================= DASHBOARD ================= */
+    function kpi(lbl, val, prev, c, goodUp = true, f = baht, extra = '') {
+      let chg = ''; if (prev != null) {
+        const d = val - prev, p = prev ? d / Math.abs(prev) * 100 : 0, good = goodUp ? d >= 0 : d <= 0;
+        chg = `<span class="${good ? 'up' : 'down'}">${d >= 0 ? '▲' : '▼'} ${Math.abs(p).toFixed(1)}%</span> จากเดือนก่อน`
+      }
+      return `<div class="card kpi" style="--c:${c}"><div class="lbl">${lbl}</div><div class="val">${f(val)}</div><div class="chg">${extra || chg}</div></div>`;
+    }
+    function pgDash() {
+      const { list, cur, prev } = ledgerTo(curYM), nextYM = addYM(curYM, 1), fc = forecast(nextYM, list), T = [...list.slice(-6), fc];
+      const debt = sum(S.inst.map(instCalc), i => i.remain), cs = catSpend(curYM), B = S.settings.budgets, AL = alerts();
+      const cats = Object.entries(cs).sort((a, b) => b[1] - a[1]); if (cur.inst) cats.push(['ผ่อนบัตรเครดิต', cur.inst]);
+      const W = weeks(curYM), months12 = [...Array(12)].map((_, k) => addYM(curYM, k));
+      const bud = S.settings.cats.expense.filter(c => (B[c] || 0) > 0 || cs[c]);
+      const tips = [];
+      if (cur.inc) {
+        if (cur.rate < 10) tips.push(['b-red', `อัตราเงินเหลือ ${cur.rate.toFixed(1)}% ต่ำมาก ควรตั้งเป้าให้ได้อย่างน้อย 20%`]);
+        else if (cur.rate < 20) tips.push(['b-yellow', `อัตราเงินเหลือ ${cur.rate.toFixed(1)}% ใกล้เป้า 20% แล้ว ลองลดรายจ่ายผันผวนอีกเล็กน้อย`]);
+        else tips.push(['b-green', `ยอดเยี่ยม! อัตราเงินเหลือ ${cur.rate.toFixed(1)}% ผ่านเป้า 20%`])
+      }
+      bud.filter(c => B[c] && cs[c] > B[c]).forEach(c => tips.push(['b-red', `หมวด "${c}" ใช้เกินงบ ${baht(cs[c] - B[c])} (${(cs[c] / B[c] * 100).toFixed(0)}%)`]));
+      S.cards.forEach(c => { const s = cardSum(c); if (s.util > 30) tips.push(['b-yellow', `${c.name} ใช้วงเงิน ${s.util.toFixed(0)}% (ควรต่ำกว่า 30% เพื่อเครดิตที่ดี)`]) });
+      const od = AL.filter(a => a.days < 0); if (od.length) tips.push(['b-red', `มี ${od.length} รายการเกินกำหนดชำระ รวม ${baht(sum(od))}`]);
+      if (fc.net < 0) tips.push(['b-red', `ประมาณการ ${ymLabel(nextYM)} ติดลบ ${baht(-fc.net)} เพราะภาระผ่อน ${baht(fc.inst)}`]);
+      else tips.push(['b-blue', `ประมาณการ ${ymLabel(nextYM)}: เหลือสุทธิ ${baht(fc.net)} (ผ่อนบัตร ${baht(fc.inst)})`]);
+
+      const html = `<div class="grid g6">
+ ${kpi('รายรับ', cur.inc, prev?.inc, 'var(--inc)')}${kpi('รายจ่ายรวม (รวมผ่อน)', cur.exp, prev?.exp, 'var(--exp)', false)}
+ ${kpi('คงเหลือสุทธิ', cur.net, prev?.net, '#06b6d4')}${kpi('ยอดยกไปเดือนหน้า', cur.close, prev?.close, 'var(--pri)', true, baht, `ยอดยกมา ${baht(cur.open)}`)}
+ ${kpi('อัตราเงินเหลือ', cur.rate, prev?.rate, '#f59e0b', true, v => v.toFixed(1) + '%')}${kpi('หนี้ผ่อนคงเหลือ', debt, null, '#8b5cf6', false, baht, `ผ่อนเดือนนี้ ${baht(cur.inst)}`)}</div>
+ <div class="grid g2"><div class="card"><h3>📈 รายรับ รายจ่าย และยอดยกไป <span class="hint">แท่งจาง = ประมาณการ</span></h3><div class="chart"><canvas id="cTrend"></canvas></div></div>
+ <div class="card"><h3>🍩 สัดส่วนรายจ่าย ${ymShort(curYM)}</h3><div class="chart"><canvas id="cCat"></canvas></div></div></div>
+ <div class="grid g3">
+ <div class="card"><h3>🔔 แจ้งเตือน <button class="btn sm" onclick="go('alerts')">ดูทั้งหมด</button></h3>
+ ${AL.slice(0, 6).map(a => { const [c, t] = stat(a.days); return `<div class="item"><div class="t"><b>${esc(a.name)}</b><small>${dLabel(a.due)} · ${baht(a.amount)}</small></div><span class="badge ${c}">${t}</span></div>` }).join('') || '<div class="empty">ไม่มีรายการ</div>'}</div>
+ <div class="card"><h3>💳 การใช้วงเงินบัตร</h3>${S.cards.map(c => {
+        const s = cardSum(c), col = s.util > 70 ? '#f43f5e' : s.util > 30 ? '#f59e0b' : '#10b981';
+        return `<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between"><b>${esc(c.name)}</b><span>${s.util.toFixed(1)}%</span></div>
+  <div class="bar" style="--c:${col};margin:6px 0"><i style="width:${Math.min(s.util, 100)}%"></i></div>
+  <div class="hint">ใช้ ${baht(s.used)} / ${baht(c.limit)} · ชำระถัดไป ${s.next ? baht(s.next.full + s.next.inst) + ' (' + dLabel(s.next.due) + ')' : '-'}</div></div>`
+      }).join('')}</div>
+ <div class="card"><h3>💡 คำแนะนำ</h3>${tips.map(([c, t]) => `<div class="tip ${c}">${t}</div>`).join('')}</div></div>
+ <div class="grid g11"><div class="card"><h3>🗓️ ภาระผ่อนบัตร 12 เดือนข้างหน้า</h3><div class="chart sm"><canvas id="cInst"></canvas></div></div>
+ <div class="card"><h3>📅 รายจ่ายผันผวนรายสัปดาห์เทียบงบ</h3><div class="chart sm"><canvas id="cWeek"></canvas></div></div></div>
+ <div class="grid g2"><div class="card"><h3>🎯 งบประมาณเทียบกับที่จ่ายจริง</h3><div class="chart" style="height:${Math.max(240, bud.length * 30)}px"><canvas id="cBud"></canvas></div></div>
+ <div class="card"><h3>🏆 เป้าหมายการออม</h3>${S.goals.map(g => {
+        const p = Math.min(g.saved / g.target * 100, 100);
+        return `<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between"><b>${esc(g.name)}</b><span>${p.toFixed(0)}%</span></div><div class="bar" style="--c:#10b981;margin:6px 0"><i style="width:${p}%"></i></div><div class="hint">${baht(g.saved)} / ${baht(g.target)}</div></div>`
+      }).join('') || '<div class="empty">ยังไม่มีเป้าหมาย</div>'}</div></div>`;
+
+      return {
+        html, after() {
+          mk('cTrend', {
+            type: 'bar', data: {
+              labels: T.map(x => ymShort(x.ym) + (x.fc ? ' (คาด)' : '')), datasets: [
+                { label: 'รายรับ', data: T.map(x => x.inc), backgroundColor: T.map(x => x.fc ? 'rgba(16,185,129,.3)' : '#10b981'), borderRadius: 6, order: 2 },
+                { label: 'รายจ่าย', data: T.map(x => x.exp), backgroundColor: T.map(x => x.fc ? 'rgba(244,63,94,.3)' : '#f43f5e'), borderRadius: 6, order: 2 },
+                {
+                  label: 'ยอดยกไป', type: 'line', data: T.map(x => x.close), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,.1)', fill: true, tension: .35, yAxisID: 'y2', order: 1, pointRadius: 4, pointBackgroundColor: '#6366f1',
+                  segment: { borderDash: c => T[c.p1DataIndex]?.fc ? [6, 4] : undefined }
+                }]
+            },
+            options: { scales: { y: yK, y2: { position: 'right', grid: { display: false }, ticks: { callback: kfmt } }, x: { grid: { display: false } } } }
+          });
+          mk('cCat', {
+            type: 'doughnut', data: { labels: cats.map(c => c[0]), datasets: [{ data: cats.map(c => c[1]), backgroundColor: PAL, borderWidth: 2, borderColor: '#fff' }] },
+            options: { cutout: '62%', plugins: { legend: { position: 'bottom' } } }
+          });
+          mk('cInst', {
+            type: 'bar', data: { labels: months12.map(ymShort), datasets: S.cards.map((c, i) => ({ label: c.name, data: months12.map(m => instInMonth(m, c.name)), backgroundColor: PAL[i], borderRadius: 4 })) },
+            options: { scales: { x: { stacked: true, grid: { display: false } }, y: { ...yK, stacked: true } } }
+          });
+          mk('cWeek', {
+            type: 'bar', data: {
+              labels: W.map(w => `สัปดาห์ ${w.w}`), datasets: [
+                { label: 'รายจ่ายผันผวน', data: W.map(w => w.vari), backgroundColor: W.map(w => w.vari > w.budget ? '#f43f5e' : '#6366f1'), borderRadius: 6, order: 2 },
+                { label: 'งบต่อสัปดาห์', type: 'line', data: W.map(w => Math.round(w.budget)), borderColor: '#f59e0b', borderDash: [5, 4], pointRadius: 3, order: 1 }]
+            },
+            options: { scales: { y: yK, x: { grid: { display: false } } } }
+          });
+          mk('cBud', {
+            type: 'bar', data: {
+              labels: bud, datasets: [{ label: 'จ่ายจริง', data: bud.map(c => cs[c] || 0), backgroundColor: bud.map(c => (cs[c] || 0) > (B[c] || 0) ? '#f43f5e' : '#10b981'), borderRadius: 4 },
+              { label: 'งบประมาณ', data: bud.map(c => B[c] || 0), backgroundColor: '#e2e8f0', borderRadius: 4 }]
+            }, options: { indexAxis: 'y', scales: { x: yK, y: { grid: { display: false } } } }
+          });
+        }
+      };
+    }
+
+    /* ================= INSTALLMENTS ================= */
+    function instForm(id) {
+      const i = S.inst.find(x => x.id === id) || { date: today(), card: S.cards[0]?.name, months: 10, rate: 0 };
+      openForm(id ? 'แก้ไขรายการผ่อน' : 'เพิ่มรายการผ่อนบัตรเครดิต', [
+        { key: 'item', label: 'รายการ', req: 1, full: 1 }, { key: 'card', label: 'บัตร', type: 'select', options: S.cards.map(c => c.name) }, { key: 'date', label: 'วันที่ซื้อ', type: 'date', req: 1 },
+        { key: 'principal', label: 'ยอดซื้อ (บาท)', type: 'number', req: 1, min: 0 }, { key: 'months', label: 'จำนวนงวด (เดือน)', type: 'number', req: 1, min: 1 },
+        { key: 'rate', label: 'ดอกเบี้ย % ต่อเดือน', type: 'number', min: 0, hint: 'ผ่อน 0% ใส่ 0' },
+        { key: 'firstDue', label: 'ครบกำหนดงวดแรก', type: 'date', hint: 'เว้นว่าง = คำนวณจากรอบบัตรอัตโนมัติ' }], i,
+        o => { o.months = Math.max(1, Math.round(o.months)); if (!o.firstDue) { const c = S.cards.find(c => c.name === o.card); o.firstDue = c ? stmtDue(c, o.date) : addMD(o.date, 1) } upsert(S.inst, o) });
+    }
+    function pgInst() {
+      const L = S.inst.map(instCalc).sort((a, b) => (a.status === 'ผ่อนครบแล้ว') - (b.status === 'ผ่อนครบแล้ว') || a.date.localeCompare(b.date));
+      const M = [...Array(12)].map((_, k) => addYM(curYM, k)), act = L.filter(i => i.dues.some(d => ymOf(d.date) >= curYM));
+      const debtEnd = m => sum(instDues().filter(d => ymOf(d.date) > m));
+      const sc = { 'กำลังผ่อน': 'b-blue', 'ยังไม่เริ่มผ่อน': 'b-yellow', 'ผ่อนครบแล้ว': 'b-green' };
+      return {
+        html: `<div class="chips"><div class="chip">หนี้ผ่อนคงเหลือ<b class="down">${baht(sum(L, i => i.remain))}</b></div><div class="chip">ผ่อน ${ymShort(curYM)}<b>${baht(instInMonth(curYM))}</b></div>
+ <div class="chip">ผ่อน ${ymShort(addYM(curYM, 1))}<b>${baht(instInMonth(addYM(curYM, 1)))}</b></div><div class="chip">รายการที่กำลังผ่อน<b>${L.filter(i => i.status !== 'ผ่อนครบแล้ว').length}</b></div>
+ <button class="btn primary" onclick="instForm()" style="margin-left:auto">+ เพิ่มรายการผ่อน</button></div>
+ <div class="card" style="margin-bottom:16px"><h3>รายการผ่อนทั้งหมด</h3><div class="tbl"><table><thead><tr><th>รายการ</th><th>บัตร</th><th>วันที่ซื้อ</th><th class="num">ยอดซื้อ</th><th class="num">ดอกเบี้ย</th><th class="num">ยอดรวมทั้งสิ้น</th><th class="num">ต่องวด</th><th>ความคืบหน้า</th><th class="num">จ่ายแล้ว</th><th class="num">คงเหลือ</th><th>งวดถัดไป</th><th>สถานะ</th><th></th></tr></thead><tbody>
+ ${L.map(i => `<tr><td><b>${esc(i.item)}</b></td><td>${esc(i.card)}</td><td>${dLabel(i.date)}</td><td class="num">${fmt(i.principal)}</td><td class="num">${i.rate}%</td><td class="num">${fmt(i.total)}</td><td class="num"><b>${fmt(i.per)}</b></td>
+ <td><div class="bar" style="--c:#6366f1"><i style="width:${i.done / i.months * 100}%"></i></div><small class="hint">${i.done}/${i.months} งวด (เหลือ ${i.left})</small></td>
+ <td class="num up">${fmt(i.paid)}</td><td class="num down"><b>${fmt(i.remain)}</b></td><td>${dLabel(i.next)}</td><td><span class="badge ${sc[i.status]}">${i.status}</span></td>
+ <td><button class="btn sm" onclick="instForm('${i.id}')">แก้ไข</button> <button class="btn sm danger" onclick="del('inst','${i.id}','${esc(i.item)}')">ลบ</button></td></tr>`).join('') || '<tr><td colspan="13" class="empty">ยังไม่มีรายการผ่อน</td></tr>'}
+ </tbody></table></div></div>
+ <div class="card"><h3>ตารางผ่อนรายเดือน (12 เดือนตั้งแต่ ${ymLabel(curYM)})</h3><div class="tbl"><table><thead><tr><th>รายการ</th><th>บัตร</th>${M.map(m => `<th class="num">${ymShort(m)}</th>`).join('')}</tr></thead><tbody>
+ ${act.map(i => `<tr><td>${esc(i.item)}</td><td>${esc(i.card)}</td>${M.map(m => { const v = sum(i.dues.filter(d => ymOf(d.date) === m)); return `<td class="num">${v ? fmt(v) : '<span class="hint">-</span>'}</td>` }).join('')}</tr>`).join('')}
+ </tbody><tfoot><tr><td colspan="2">รวมต่อเดือน</td>${M.map(m => `<td class="num">${fmt(instInMonth(m))}</td>`).join('')}</tr>
+ <tr><td colspan="2">หนี้คงเหลือสิ้นเดือน</td>${M.map(m => `<td class="num down">${fmt(debtEnd(m))}</td>`).join('')}</tr></tfoot></table></div></div>`
+      };
+    }
+
+    /* ================= CARDS ================= */
+    function cardForm(i) {
+      const c = i != null ? S.cards[i] : { cutoff: 31, due: 25, limit: 30000, paidUntil: '' }, old = c.name;
+      openForm(i != null ? 'แก้ไขบัตร' : 'เพิ่มบัตรเครดิต', [{ key: 'name', label: 'ชื่อบัตร', req: 1 }, { key: 'limit', label: 'วงเงิน', type: 'number', req: 1 },
+      { key: 'cutoff', label: 'วันตัดรอบ (31 = สิ้นเดือน)', type: 'number', min: 1, max: 31, req: 1 }, { key: 'due', label: 'วันครบกำหนดชำระ', type: 'number', min: 1, max: 31, req: 1 },
+      { key: 'paidUntil', label: 'ชำระแล้วถึงรอบวันที่', type: 'date', full: 1, hint: 'รอบบิลที่ครบกำหนดก่อนหรือตรงวันนี้ จะถือว่าชำระแล้ว' }], c,
+        o => { if (i != null) { S.cards[i] = o; if (old && old !== o.name) { S.tx.forEach(t => { if (t.method === old) t.method = o.name }); S.inst.forEach(x => { if (x.card === old) x.card = o.name }) } } else { o.id = uid(); S.cards.push(o) } });
+    }
+    function payCard(i) {
+      const c = S.cards[i], s = cardSum(c); if (!s.next) return;
+      if (confirm(`ยืนยันชำระ ${c.name} ยอด ${baht(s.next.full + s.next.inst)} (ครบกำหนด ${dLabel(s.next.due)})?`)) { c.paidUntil = s.next.due; save(); render(); toast('บันทึกการชำระบัตรแล้ว') }
+    }
+    function delCard(i) { if (confirm(`ลบ ${S.cards[i].name}?`)) { S.cards.splice(i, 1); save(); render() } }
+    function pgCards() {
+      const G = [['#4f46e5', '#7c3aed'], ['#db2777', '#f97316'], ['#0891b2', '#10b981'], ['#334155', '#0f172a']];
+      return {
+        html: `<div style="text-align:right;margin-bottom:12px"><button class="btn primary" onclick="cardForm()">+ เพิ่มบัตร</button></div><div class="grid g11">
+ ${S.cards.map((c, i) => {
+          const s = cardSum(c), g = G[i % 4], col = s.util > 70 ? '#f43f5e' : s.util > 30 ? '#f59e0b' : '#10b981';
+          return `<div class="card"><div class="cc" style="--c1:${g[0]};--c2:${g[1]}"><div style="display:flex;justify-content:space-between"><b style="font-size:18px">💳 ${esc(c.name)}</b><span>วงเงิน ${baht(c.limit)}</span></div>
+ <div><small style="opacity:.8">ยอดชำระรอบถัดไป</small><div style="font-size:28px;font-weight:700">${baht(s.next ? s.next.full + s.next.inst : 0)}</div><small style="opacity:.85">${s.next ? 'ครบกำหนด ' + dLabel(s.next.due) : 'ไม่มียอดค้างชำระ'}</small></div>
+ <div style="display:flex;justify-content:space-between;font-size:12px;opacity:.9"><span>ตัดรอบ: ${c.cutoff >= 31 ? 'สิ้นเดือน' : 'วันที่ ' + c.cutoff}</span><span>ชำระ: ทุกวันที่ ${c.due}</span></div></div>
+ <div style="margin:16px 0"><div style="display:flex;justify-content:space-between"><span>ใช้วงเงิน</span><b>${s.util.toFixed(1)}%</b></div><div class="bar" style="--c:${col};margin:6px 0"><i style="width:${Math.min(s.util, 100)}%"></i></div></div>
+ <div class="chips"><div class="chip">ยอดที่ยังไม่ชำระ<b>${baht(s.used)}</b></div><div class="chip">วงเงินคงเหลือ<b class="up">${baht(c.limit - s.used)}</b></div><div class="chip">หนี้ผ่อนคงเหลือ<b>${baht(s.debt)}</b></div></div>
+ <table><thead><tr><th>ครบกำหนด</th><th class="num">รูดเต็ม</th><th class="num">ผ่อน</th><th class="num">รวม</th></tr></thead><tbody>
+ ${s.pays.slice(0, 6).map(p => `<tr><td>${dLabel(p.due)}</td><td class="num">${fmt(p.full)}</td><td class="num">${fmt(p.inst)}</td><td class="num"><b>${fmt(p.full + p.inst)}</b></td></tr>`).join('') || '<tr><td colspan="4" class="empty">ไม่มียอด</td></tr>'}</tbody></table>
+ <div class="actions" style="margin-top:12px">${s.next ? `<button class="btn ok" onclick="payCard(${i})">✓ ชำระรอบนี้แล้ว</button>` : ''}<button class="btn sm" onclick="cardForm(${i})">แก้ไข</button><button class="btn sm danger" onclick="delCard(${i})">ลบ</button></div></div>`
+        }).join('')}</div>`
+      };
+    }
+
+    /* ================= ALERTS / BILLS ================= */
+    function billForm(id) {
+      const b = S.bills.find(x => x.id === id) || { nature: 'คงที่', day: 1, paid: [], auto: 'ไม่ใช่' };
+      openForm(id ? 'แก้ไขรายการประจำ' : 'เพิ่มรายการที่ต้องจ่ายประจำ', [{ key: 'name', label: 'ชื่อรายการ', req: 1, full: 1 }, { key: 'category', label: 'หมวดหมู่', type: 'select', options: S.settings.cats.expense },
+      { key: 'nature', label: 'ลักษณะ', type: 'select', options: ['คงที่', 'ผันผวน'] }, { key: 'amount', label: 'จำนวนเงิน (โดยประมาณ)', type: 'number', req: 1 },
+      { key: 'day', label: 'ครบกำหนดทุกวันที่', type: 'number', min: 1, max: 31, req: 1 }, { key: 'auto', label: 'ตัดอัตโนมัติ', type: 'select', options: ['ไม่ใช่', 'ใช่'] }], b, o => upsert(S.bills, o));
+    }
+    function payBill(id, ym) {
+      const b = S.bills.find(x => x.id === id); b.paid.push(ym);
+      if (b.auto !== 'ใช่' && confirm(`บันทึก "${b.name}" ${baht(b.amount)} เป็นรายจ่ายด้วยไหม?`))
+        S.tx.push({ id: uid(), date: today(), type: 'รายจ่าย', nature: b.nature, category: b.category, desc: b.name, freq: 'รายเดือน', method: 'โอน', amount: b.amount, note: 'บันทึกจากแจ้งเตือน' });
+      save(); render(); toast('ทำเครื่องหมายชำระแล้ว');
+    }
+    function pgAlerts() {
+      const A = alerts(), cnt = k => A.filter(k).length;
+      return {
+        html: `<div class="grid g6">${kpi('เกินกำหนด', cnt(a => a.days < 0), null, '#f43f5e', 1, fmt, 'รายการ')}${kpi('ครบกำหนดวันนี้', cnt(a => a.days === 0), null, '#f97316', 1, fmt, 'รายการ')}
+ ${kpi('ภายใน 7 วัน', cnt(a => a.days > 0 && a.days <= 7), null, '#f59e0b', 1, fmt, 'รายการ')}${kpi('ยอดที่ต้องจ่ายใน 30 วัน', sum(A.filter(a => a.days <= 30)), null, 'var(--pri)', 1, baht, 'รวมบัตรและบิล')}</div>
+ <div class="grid g11"><div class="card"><h3>🔔 รายการที่ต้องชำระ</h3>${A.map(a => {
+          const [c, t] = stat(a.days);
+          const btn = a.kind === 'bill' ? (a.auto ? '<span class="badge b-gray">ตัดอัตโนมัติ</span>' : `<button class="btn sm ok" onclick="payBill('${a.id}','${a.ym}')">ชำระแล้ว</button>`) : (a.first ? `<button class="btn sm ok" onclick="payCard(${a.ci})">ชำระแล้ว</button>` : '');
+          return `<div class="item"><div class="t"><b>${esc(a.name)}</b><small>${a.type} · ครบ ${dLabel(a.due)} · <b>${baht(a.amount)}</b>${a.detail ? ' · ' + a.detail : ''}</small></div><span class="badge ${c}">${t}</span>${btn}</div>`
+        }).join('') || '<div class="empty">ไม่มีรายการ</div>'}</div>
+ <div class="card"><h3>📋 รายการที่ต้องจ่ายประจำ <button class="btn sm primary" onclick="billForm()">+ เพิ่ม</button></h3><div class="tbl"><table><thead><tr><th>รายการ</th><th>หมวด</th><th class="num">จำนวน</th><th>วันที่</th><th></th></tr></thead><tbody>
+ ${S.bills.map(b => `<tr><td>${esc(b.name)} ${b.auto === 'ใช่' ? '<span class="badge b-gray">อัตโนมัติ</span>' : ''}</td><td>${esc(b.category)}</td><td class="num">${fmt(b.amount)}</td><td>ทุกวันที่ ${b.day}</td>
+ <td><button class="btn sm" onclick="billForm('${b.id}')">แก้ไข</button> <button class="btn sm danger" onclick="del('bills','${b.id}','${esc(b.name)}')">ลบ</button></td></tr>`).join('')}</tbody></table></div></div></div>`
+      };
+    }
+
+    /* ================= REPORTS ================= */
+    let repTab = 'week';
+    function pgReport() {
+      const tabs = `<div class="tabs"><button class="btn ${repTab === 'week' ? 'on' : ''}" onclick="repTab='week';render()">รายสัปดาห์</button><button class="btn ${repTab === 'month' ? 'on' : ''}" onclick="repTab='month';render()">รายเดือน</button><button class="btn ${repTab === 'ledger' ? 'on' : ''}" onclick="repTab='ledger';render()">ยอดยกไปรายเดือน</button></div>`;
+      if (repTab === 'week') {
+        const W = weeks(curYM), [y, m] = curYM.split('-').map(Number);
+        return {
+          html: tabs + `<div class="card" style="margin-bottom:16px"><h3>รายงานรายสัปดาห์ ${ymLabel(curYM)}</h3><div class="chart"><canvas id="cW"></canvas></div></div>
+  <div class="card"><div class="tbl"><table><thead><tr><th>สัปดาห์</th><th>ช่วงวันที่</th><th class="num">รายรับ</th><th class="num">คงที่</th><th class="num">ผันผวน</th><th class="num">ผ่อนบัตร</th><th class="num">รวมจ่าย</th><th class="num">คงเหลือ</th><th class="num">งบผันผวน</th><th class="num">ผลต่าง</th><th class="num">เฉลี่ย/วัน</th><th>หมวดที่ใช้มากสุด</th><th>สถานะ</th></tr></thead><tbody>
+  ${W.map(w => {
+            const d = w.budget - w.vari; return `<tr><td>สัปดาห์ ${w.w}</td><td>${w.s}-${w.e} ${TH_M[m - 1]}</td><td class="num up">${fmt(w.inc)}</td><td class="num">${fmt(w.fix)}</td><td class="num">${fmt(w.vari)}</td><td class="num">${fmt(w.inst)}</td><td class="num down">${fmt(w.exp)}</td>
+  <td class="num ${w.net >= 0 ? 'up' : 'down'}"><b>${fmt(w.net)}</b></td><td class="num">${fmt(w.budget)}</td><td class="num ${d >= 0 ? 'up' : 'down'}">${fmt(d)}</td><td class="num">${fmt(w.vari / (w.e - w.s + 1))}</td><td>${esc(w.top)}</td>
+  <td><span class="badge ${d >= 0 ? 'b-green' : 'b-red'}">${d >= 0 ? 'อยู่ในงบ' : 'เกินงบ'}</span></td></tr>`
+          }).join('')}</tbody>
+  <tfoot><tr><td colspan="2">รวม</td>${['inc', 'fix', 'vari', 'inst', 'exp', 'net', 'budget'].map(k => `<td class="num">${fmt(sum(W, w => w[k]))}</td>`).join('')}<td colspan="4"></td></tr></tfoot></table></div></div>`,
+          after() {
+            mk('cW', {
+              type: 'bar', data: {
+                labels: W.map(w => 'สัปดาห์ ' + w.w), datasets: [{ label: 'คงที่', data: W.map(w => w.fix), backgroundColor: '#6366f1', stack: 'e' }, { label: 'ผันผวน', data: W.map(w => w.vari), backgroundColor: '#f59e0b', stack: 'e' },
+                { label: 'ผ่อนบัตร', data: W.map(w => w.inst), backgroundColor: '#ec4899', stack: 'e' }, { label: 'รายรับ', data: W.map(w => w.inc), backgroundColor: '#10b981', stack: 'i' }]
+              }, options: { scales: { y: { ...yK, stacked: true }, x: { stacked: true, grid: { display: false } } } }
+            })
+          }
+        }
+      }
+      if (repTab === 'month') {
+        const a = monthAgg(curYM), cs = catSpend(curYM), B = S.settings.budgets, inc = {}, meth = {};
+        S.tx.filter(t => ymOf(t.date) === curYM).forEach(t => { if (t.type === 'รายรับ') inc[t.category] = (inc[t.category] || 0) + t.amount; else meth[t.method] = (meth[t.method] || 0) + t.amount });
+        const g = { need: 0, want: a.inst, save: 0 }; Object.entries(cs).forEach(([c, v]) => g[GROUP[c] || 'need'] += v);
+        const rule = [['ความจำเป็น (Needs)', g.need, 50, '#6366f1'], ['ความต้องการ (Wants) รวมผ่อน', g.want, 30, '#f59e0b'], ['ออมและลงทุน (Savings)', g.save, 20, '#10b981']];
+        const rows = S.settings.cats.expense.filter(c => B[c] || cs[c]);
+        return {
+          html: tabs + `<div class="grid g6">${kpi('รายรับ', a.inc, null, 'var(--inc)', 1, baht, ymLabel(curYM))}${kpi('รายจ่ายคงที่', a.fix, null, '#6366f1', 0, baht, ' ')}${kpi('รายจ่ายผันผวน', a.vari, null, '#f59e0b', 0, baht, ' ')}${kpi('ผ่อนบัตร', a.inst, null, '#ec4899', 0, baht, ' ')}${kpi('คงเหลือสุทธิ', a.net, null, '#06b6d4', 1, baht, `อัตราเงินเหลือ ${a.rate.toFixed(1)}%`)}</div>
+  <div class="grid g2"><div class="card"><h3>งบประมาณเทียบกับที่จ่ายจริงรายหมวด</h3><div class="tbl"><table><thead><tr><th>หมวด</th><th class="num">งบ</th><th class="num">จ่ายจริง</th><th class="num">คงเหลือ</th><th>% ใช้งบ</th></tr></thead><tbody>
+  ${rows.map(c => {
+            const b = B[c] || 0, v = cs[c] || 0, p = b ? v / b * 100 : (v ? 100 : 0); return `<tr><td>${esc(c)}</td><td class="num">${fmt(b)}</td><td class="num">${fmt(v)}</td><td class="num ${b - v >= 0 ? 'up' : 'down'}">${fmt(b - v)}</td>
+  <td><div style="display:flex;gap:8px;align-items:center"><div class="bar" style="--c:${p > 100 ? '#f43f5e' : p > 80 ? '#f59e0b' : '#10b981'};flex:1"><i style="width:${Math.min(p, 100)}%"></i></div><small>${p.toFixed(0)}%</small></div></td></tr>`
+          }).join('')}</tbody>
+  <tfoot><tr><td>รวม</td><td class="num">${fmt(sum(rows, c => B[c]))}</td><td class="num">${fmt(sum(rows, c => cs[c]))}</td><td class="num">${fmt(sum(rows, c => (B[c] || 0) - (cs[c] || 0)))}</td><td></td></tr></tfoot></table></div></div>
+  <div class="card"><h3>หลัก 50/30/20</h3>${rule.map(([l, v, t, c]) => {
+            const p = a.inc ? v / a.inc * 100 : 0; return `<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between"><b>${l}</b><span>${p.toFixed(1)}% <span class="hint">/ เป้า ${t}%</span></span></div>
+  <div class="bar" style="--c:${c};margin:6px 0;height:10px"><i style="width:${Math.min(p, 100)}%"></i></div><div class="hint">${baht(v)} · ${p <= t || t === 20 && p >= t ? '✓ ' : '⚠ '}${t === 20 ? (p >= t ? 'ผ่านเป้า' : 'ต่ำกว่าเป้า') : (p <= t ? 'อยู่ในเกณฑ์' : 'สูงกว่าเกณฑ์')}</div></div>`
+          }).join('')}</div></div>
+  <div class="grid g11"><div class="card"><h3>รายรับแยกตามแหล่ง</h3><div class="chart sm"><canvas id="cInc"></canvas></div></div><div class="card"><h3>รายจ่ายแยกตามช่องทาง (ไม่รวมผ่อน)</h3><div class="chart sm"><canvas id="cMeth"></canvas></div></div></div>`,
+          after() {
+            mk('cInc', { type: 'doughnut', data: { labels: Object.keys(inc), datasets: [{ data: Object.values(inc), backgroundColor: PAL.slice(2), borderColor: '#fff', borderWidth: 2 }] }, options: { cutout: '60%', plugins: { legend: { position: 'right' } } } });
+            mk('cMeth', { type: 'bar', data: { labels: Object.keys(meth), datasets: [{ label: 'ยอดจ่าย', data: Object.values(meth), backgroundColor: PAL, borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: yK, x: { grid: { display: false } } } } })
+          }
+        };
+      }
+      const L = ledger(curYM >= S.settings.startMonth ? curYM : S.settings.startMonth), F = forecast(addYM(L.at(-1).ym, 1), L), R = [...L, F];
+      return {
+        html: tabs + `<div class="card" style="margin-bottom:16px"><h3>ยอดยกไปสะสม</h3><div class="chart sm"><canvas id="cL"></canvas></div></div>
+ <div class="card"><div class="tbl"><table><thead><tr><th>เดือน</th><th class="num">ยอดยกมา</th><th class="num">รายรับ</th><th class="num">คงที่</th><th class="num">ผันผวน</th><th class="num">ผ่อนบัตร</th><th class="num">รวมจ่าย</th><th class="num">คงเหลือสุทธิ</th><th class="num">ยอดยกไป</th><th class="num">% เหลือ</th><th>สถานะ</th></tr></thead><tbody>
+ ${R.map(x => `<tr style="${x.fc ? 'opacity:.7;font-style:italic' : ''}"><td><b>${ymLabel(x.ym)}</b></td><td class="num">${fmt(x.open)}</td><td class="num up">${fmt(x.inc)}</td><td class="num">${fmt(x.fix)}</td><td class="num">${fmt(x.vari)}</td><td class="num">${fmt(x.inst)}</td><td class="num down">${fmt(x.exp)}</td>
+ <td class="num ${x.net >= 0 ? 'up' : 'down'}">${fmt(x.net)}</td><td class="num"><b>${fmt(x.close)}</b></td><td class="num">${x.rate.toFixed(1)}%</td>
+ <td><span class="badge ${x.fc ? 'b-gray' : x.ym === ymOf(today()) ? 'b-blue' : x.ym < ymOf(today()) ? 'b-green' : 'b-gray'}">${x.fc ? 'ประมาณการ' : x.ym === ymOf(today()) ? 'เดือนปัจจุบัน' : x.ym < ymOf(today()) ? 'ปิดบัญชีแล้ว' : 'อนาคต'}</span></td></tr>`).join('')}</tbody></table></div></div>`,
+        after() {
+          mk('cL', {
+            type: 'line', data: {
+              labels: R.map(x => ymShort(x.ym)), datasets: [{ label: 'ยอดยกไป', data: R.map(x => x.close), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,.12)', fill: true, tension: .35, segment: { borderDash: c => R[c.p1DataIndex]?.fc ? [6, 4] : undefined } },
+              { label: 'คงเหลือสุทธิ', data: R.map(x => x.net), borderColor: '#10b981', tension: .35 }]
+            }, options: { scales: { y: yK, x: { grid: { display: false } } } }
+          })
+        }
+      };
+    }
+
+    /* ================= GOALS ================= */
+    function goalForm(id) {
+      const g = S.goals.find(x => x.id === id) || { saved: 0 };
+      openForm(id ? 'แก้ไขเป้าหมาย' : 'เพิ่มเป้าหมายการออม', [{ key: 'name', label: 'ชื่อเป้าหมาย', req: 1, full: 1 }, { key: 'target', label: 'ยอดเป้าหมาย', type: 'number', req: 1 }, { key: 'saved', label: 'ออมแล้ว', type: 'number' }, { key: 'deadline', label: 'กำหนดเสร็จ', type: 'date', req: 1 }], g, o => upsert(S.goals, o))
+    }
+    function addSave(id) { const g = S.goals.find(x => x.id === id), v = parseFloat(prompt(`ฝากเพิ่มเข้า "${g.name}" (บาท)`)); if (!v) return; g.saved += v; save(); render(); toast(`เพิ่ม ${baht(v)} แล้ว`) }
+    function pgGoals() {
+      const ref = today(), avgInc = (L => sum(L.slice(-3), x => x.inc) / Math.max(1, Math.min(3, L.length)))(ledgerTo(ymOf(ref)).list);
+      return {
+        html: `<div style="text-align:right;margin-bottom:12px"><button class="btn primary" onclick="goalForm()">+ เพิ่มเป้าหมาย</button></div><div class="grid g3">
+ ${S.goals.map(g => {
+          const p = Math.min(g.saved / g.target * 100, 100), rem = Math.max(g.target - g.saved, 0), ml = Math.max(1, Math.ceil(diffDays(g.deadline, ref) / 30.44)), need = rem / ml;
+          const st = rem <= 0 ? ['b-green', 'สำเร็จแล้ว 🎉'] : diffDays(g.deadline, ref) < 0 ? ['b-red', 'เลยกำหนด'] : need > avgInc * .15 ? ['b-yellow', 'ต้องเร่ง'] : ['b-blue', 'ตามแผน'];
+          return `<div class="card"><h3>${esc(g.name)} <span class="badge ${st[0]}">${st[1]}</span></h3>
+  <div style="font-size:26px;font-weight:700">${p.toFixed(1)}%</div><div class="bar" style="--c:#10b981;height:12px;margin:8px 0"><i style="width:${p}%"></i></div>
+  <div class="chips"><div class="chip">ออมแล้ว<b class="up">${baht(g.saved)}</b></div><div class="chip">เป้าหมาย<b>${baht(g.target)}</b></div><div class="chip">คงเหลือ<b>${baht(rem)}</b></div>
+  <div class="chip">ต้องออม/เดือน<b>${baht(need)}</b></div><div class="chip">เหลือเวลา<b>${ml} เดือน</b></div></div><div class="hint">กำหนดเสร็จ ${dLabel(g.deadline)}</div>
+  <div class="actions" style="margin-top:12px"><button class="btn ok sm" onclick="addSave('${g.id}')">+ ฝากเพิ่ม</button><button class="btn sm" onclick="goalForm('${g.id}')">แก้ไข</button><button class="btn sm danger" onclick="del('goals','${g.id}','${esc(g.name)}')">ลบ</button></div></div>`
+        }).join('') || '<div class="card empty">ยังไม่มีเป้าหมาย</div>'}</div>`
+      };
+    }
+
+    /* ================= SETTINGS ================= */
+    function setS(k, v) { S.settings[k] = v; save(); if (k === 'refDate') { curYM = ymOf(today()); $('#monthSel').value = curYM } render(); toast('บันทึกการตั้งค่าแล้ว') }
+    function setCats(k, v) { S.settings.cats[k] = v.split(/[,\n]/).map(s => s.trim()).filter(Boolean); save(); render(); toast('อัปเดตหมวดหมู่แล้ว') }
+    function dl(name, data, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type })); a.download = name; a.click() }
+    function exportJSON() { dl(`money-backup-${today()}.json`, JSON.stringify(S, null, 1), 'application/json') }
+    function exportCSV() {
+      const h = ['วันที่', 'ประเภท', 'ลักษณะ', 'หมวดหมู่', 'รายละเอียด', 'ความถี่', 'ช่องทาง', 'จำนวนเงิน', 'หมายเหตุ'];
+      const rows = [...S.tx].sort((a, b) => a.date.localeCompare(b.date)).map(t => [t.date, t.type, t.nature, t.category, t.desc, t.freq, t.method, t.amount, t.note].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
+      dl(`transactions-${today()}.csv`, '\ufeff' + [h.join(','), ...rows].join('\n'), 'text/csv')
+    }
+    function importJSON(f) { const r = new FileReader(); r.onload = () => { try { const d = JSON.parse(r.result); if (!d.tx) throw 0; S = d; save(); curYM = ymOf(today()); $('#monthSel').value = curYM; render(); toast('นำเข้าข้อมูลสำเร็จ') } catch (e) { alert('ไฟล์ไม่ถูกต้อง') } }; r.readAsText(f) }
+    function resetData(sampleData) {
+      if (!confirm(sampleData ? 'โหลดข้อมูลตัวอย่างทับข้อมูลปัจจุบัน?' : 'ลบข้อมูลทั้งหมด (ไม่สามารถกู้คืนได้)?')) return;
+      if (sampleData) S = sample(); else { const s = sample(); S = { settings: { ...s.settings, opening: 0, startMonth: ymOf(ymd(new Date())), refDate: '' }, tx: [], cards: s.cards.map(c => ({ ...c, paidUntil: '' })), inst: [], bills: [], goals: [] } }
+      save(); curYM = ymOf(today()); $('#monthSel').value = curYM; render(); toast('เรียบร้อย')
+    }
+    function pgSettings() {
+      const s = S.settings;
+      return {
+        html: `<div class="grid g11"><div class="card"><h3>⚙️ ทั่วไป</h3><div class="set-grid">
+ <label><span>ยอดเงินยกมาเริ่มต้น</span><input type="number" value="${s.opening}" onchange="setS('opening',+this.value)"></label>
+ <label><span>เดือนเริ่มต้นบัญชี</span><input type="month" value="${s.startMonth}" onchange="setS('startMonth',this.value)"></label>
+ <label><span>งบรายจ่ายผันผวนต่อเดือน</span><input type="number" value="${s.varBudget}" onchange="setS('varBudget',+this.value)"></label>
+ <label><span>วันที่อ้างอิง (ว่าง = วันนี้)</span><input type="date" value="${s.refDate || ''}" onchange="setS('refDate',this.value)"></label></div>
+ <p class="hint" style="margin-top:10px">ข้อมูลตัวอย่างตั้งวันที่อ้างอิงไว้ที่ 25 ต.ค. 2569 เมื่อเริ่มใช้จริงให้ลบค่านี้ออก ระบบจะใช้วันที่ปัจจุบันแทน</p></div>
+ <div class="card"><h3>💾 ข้อมูลและสำรองไฟล์</h3><p class="hint" style="margin-bottom:12px">ข้อมูลเก็บไว้ในเบราว์เซอร์นี้ ควรสำรองเป็นไฟล์ JSON อย่างน้อยเดือนละครั้ง</p>
+ <div class="actions" style="justify-content:flex-start;flex-wrap:wrap"><button class="btn" onclick="exportJSON()">⬇ สำรองข้อมูล (JSON)</button><button class="btn" onclick="exportCSV()">⬇ ส่งออกรายการ (CSV/Excel)</button>
+ <label class="btn">⬆ นำเข้า JSON<input type="file" accept=".json" hidden onchange="importJSON(this.files[0])"></label>
+ <button class="btn ghost" onclick="resetData(true)">โหลดข้อมูลตัวอย่าง</button><button class="btn danger" onclick="resetData(false)">เริ่มบัญชีใหม่ (ล้างข้อมูล)</button></div></div></div>
+ ${notifyCard()}<div class="card" style="margin-bottom:16px"><h3>🎯 งบประมาณรายหมวด (ต่อเดือน)</h3>
+<div class="set-grid">
+ ${s.cats.expense.map(c => `<label><span>${esc(c)}</span><input type="number" value="${s.budgets[c] || 0}" data-c="${esc(c)}" onchange="S.settings.budgets[this.dataset.c]=+this.value;save();toast('บันทึกงบแล้ว')"></label>`).join('')}</div></div>
+ <div class="grid g11"><div class="card"><h3>หมวดรายรับ</h3><textarea rows="5" onchange="setCats('income',this.value)">${esc(s.cats.income.join(', '))}</textarea><p class="hint">คั่นด้วยเครื่องหมายจุลภาค</p></div>
+ <div class="card"><h3>หมวดรายจ่าย</h3><textarea rows="5" onchange="setCats('expense',this.value)">${esc(s.cats.expense.join(', '))}</textarea><p class="hint">หมวด "ออมและลงทุน" นับเป็น Savings, "ช้อปปิ้ง/บันเทิง/สมาชิกรายเดือน" นับเป็น Wants</p></div></div>`
+      };
+    }
+
+    /* ================= ROUTER ================= */
+    /* ================= GOOGLE CHAT ================= */
+    const NDEF = { enabled: true, daysBefore: 3, weekly: true, monthly: true };
+    const NS = () => ({ ...NDEF, ...(S.settings.notify || {}) });
+    function setN(k, v) { S.settings.notify = { ...NS(), [k]: v }; save(); toast('บันทึกการตั้งค่าแจ้งเตือนแล้ว') }
+    async function sendNow(mode) {
+      if (!CLOUD || !localStorage.getItem(AUTH)) return alert('ต้องเปิดแอปผ่าน Netlify และเข้าสู่ระบบก่อน');
+      toast('กำลังส่ง...'); clearTimeout(saveT); if (dirty()) await push();
+      try {
+        const r = await api('notify', { method: 'POST', body: JSON.stringify({ mode }) }); const j = await r.json();
+        if (r.ok) toast('ส่งเข้า Google Chat แล้ว ✓'); else alert('ส่งไม่สำเร็จ: ' + (j.error || 'HTTP ' + j.status))
+      }
+      catch (e) { if (e.message !== 'auth') toast('ส่งไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต') }
+    }
+    function notifyCard() {
+      const n = NS(), yn = (k, l) => `<label><span>${l}</span><select onchange="setN('${k}',this.value==='1')"><option value="1" ${n[k] ? 'selected' : ''}>เปิด</option><option value="0" ${!n[k] ? 'selected' : ''}>ปิด</option></select></label>`;
+      return `<div class="card" style="margin-bottom:16px"><h3>💬 แจ้งเตือนผ่าน Google Chat <span class="badge ${CLOUD ? 'b-green' : 'b-gray'}">${CLOUD ? 'โหมดคลาวด์' : 'โหมดออฟไลน์'}</span></h3>
+ <div class="set-grid">${yn('enabled', 'แจ้งเตือนครบกำหนดทุกวัน')}
+ <label><span>แจ้งล่วงหน้า (วัน)</span><input type="number" min="0" max="30" value="${n.daysBefore}" onchange="setN('daysBefore',+this.value)"></label>
+ ${yn('weekly', 'รายงานสัปดาห์ (ทุกวันจันทร์)')}${yn('monthly', 'รายงานเดือน (ทุกวันที่ 1)')}</div>
+ <p class="hint" style="margin:10px 0">ระบบส่งทุกวันเวลา 08:00 น. แจ้งรายการที่เกินกำหนด ครบกำหนดวันนี้ และรายการที่จะครบกำหนดภายในจำนวนวันที่ตั้งไว้</p>
+ <div class="actions" style="justify-content:flex-start;flex-wrap:wrap">
+ <button class="btn" onclick="sendNow('test')">🧪 ทดสอบการเชื่อมต่อ</button><button class="btn" onclick="sendNow('alerts')">🔔 ส่งแจ้งเตือนตอนนี้</button>
+ <button class="btn" onclick="sendNow('weekly')">📅 ส่งรายงานสัปดาห์</button><button class="btn" onclick="sendNow('monthly')">📊 ส่งรายงานเดือน</button>
+ ${CLOUD ? '<button class="btn ghost" onclick="logout()">ออกจากระบบ</button>' : ''}</div></div>`
+    }
+    const PAGES = {
+      dash: ['📊', 'Dashboard', pgDash], tx: ['🧾', 'บันทึกรายการ', pgTx], inst: ['🗓️', 'ผ่อนบัตรเครดิต', pgInst], cards: ['💳', 'บัตรเครดิต', pgCards],
+      alerts: ['🔔', 'แจ้งเตือน', pgAlerts], report: ['📈', 'รายงาน', pgReport], goals: ['🎯', 'เป้าหมายการออม', pgGoals], settings: ['⚙️', 'ตั้งค่า', pgSettings]
+    };
+    let page = 'dash', curYM;
+    function go(p) { page = p; render(); window.scrollTo(0, 0) }
+    function renderNav() {
+      const n = alerts().filter(a => a.days <= 7).length;
+      $('#nav').innerHTML = Object.entries(PAGES).map(([k, [ic, t]]) => `<button class="nav ${k === page ? 'active' : ''}" onclick="go('${k}')"><span>${ic}</span><span class="txt">${t}</span>${k === 'alerts' && n ? `<span class="dot">${n}</span>` : ''}</button>`).join('')
+    }
+    function render() {
+      Object.keys(charts).forEach(k => { charts[k].destroy(); delete charts[k] });
+      const [, t, fn] = PAGES[page]; $('#pageTitle').textContent = t;
+      $('#refInfo').textContent = `ข้อมูล ณ ${dLabel(today())} · กำลังดู ${ymLabel(curYM)}`;
+      const r = fn(); $('#content').innerHTML = r.html; r.after && r.after(); renderNav();
+    }
+    curYM = ymOf(today()); $('#monthSel').value = curYM;
+    $('#monthSel').onchange = e => { if (e.target.value) { curYM = e.target.value; render() } };
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() });
+    render();
+    pull();
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && !saveT) pull() });
+
+  </script>
+</body>
+
+</html>
