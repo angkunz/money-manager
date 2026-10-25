@@ -1762,9 +1762,18 @@
       $('#mForm').innerHTML = fields.map(f => `<label class="${f.full ? 'full' : ''}"><span>${f.label}</span>${inp(f, data[f.key])}${f.hint ? `<div class="hint">${f.hint}</div>` : ''}</label>`).join('')
         + `<div class="actions full"><button type="button" class="btn ghost" onclick="closeModal()">ยกเลิก</button><button class="btn primary">บันทึก</button></div>`;
       $('#mForm').onsubmit = e => {
-        e.preventDefault(); const o = { ...data }, el = $('#mForm').elements;
-        fields.forEach(f => o[f.key] = f.type === 'number' ? (parseFloat(el[f.key].value) || 0) : el[f.key].value.trim());
-        onSave(o); save(); closeModal(); render(); toast('บันทึกเรียบร้อย')
+        e.preventDefault();
+        const o = { ...data };
+        fields.forEach(f => {
+          const input = e.target.querySelector(`[name="${f.key}"]`);
+          const val = input ? input.value : '';
+          o[f.key] = f.type === 'number' ? (parseFloat(val) || 0) : String(val ?? '').trim();
+        });
+        onSave(o);
+        save();
+        closeModal();
+        render();
+        toast('บันทึกเรียบร้อย');
       };
       $('#modal').classList.add('show'); after && after();
     }
@@ -2092,13 +2101,27 @@
 
     /* ================= INSTALLMENTS ================= */
     function instForm(id) {
+      if (!S.cards || S.cards.length === 0) {
+        if (confirm('ยังไม่มีข้อมูลบัตรเครดิตในระบบ คุณต้องเพิ่มบัตรเครดิตก่อนบันทึกรายการผ่อน\nต้องการไปที่หน้าเพิ่มบัตรเครดิตเลยหรือไม่?')) {
+          go('cards');
+          cardForm();
+        }
+        return;
+      }
       const i = S.inst.find(x => x.id === id) || { date: today(), card: S.cards[0]?.name, months: 10, rate: 0 };
       openForm(id ? 'แก้ไขรายการผ่อน' : 'เพิ่มรายการผ่อนบัตรเครดิต', [
         { key: 'item', label: 'รายการ', req: 1, full: 1 }, { key: 'card', label: 'บัตร', type: 'select', options: S.cards.map(c => c.name) }, { key: 'date', label: 'วันที่ซื้อ', type: 'date', req: 1 },
         { key: 'principal', label: 'ยอดซื้อ (บาท)', type: 'number', req: 1, min: 0 }, { key: 'months', label: 'จำนวนงวด (เดือน)', type: 'number', req: 1, min: 1 },
         { key: 'rate', label: 'ดอกเบี้ย % ต่อเดือน', type: 'number', min: 0, hint: 'ผ่อน 0% ใส่ 0' },
         { key: 'firstDue', label: 'ครบกำหนดงวดแรก', type: 'date', hint: 'เว้นว่าง = คำนวณจากรอบบัตรอัตโนมัติ' }], i,
-        o => { o.months = Math.max(1, Math.round(o.months)); if (!o.firstDue) { const c = S.cards.find(c => c.name === o.card); o.firstDue = c ? stmtDue(c, o.date) : addMD(o.date, 1) } upsert(S.inst, o) });
+        o => {
+          o.months = Math.max(1, Math.round(o.months));
+          if (!o.firstDue) {
+            const c = S.cards.find(c => c.name === o.card);
+            o.firstDue = c ? stmtDue(c, o.date) : addMD(o.date, 1);
+          }
+          upsert(S.inst, o);
+        });
     }
     function pgInst() {
       const L = S.inst.map(instCalc).sort((a, b) => (a.status === 'ผ่อนครบแล้ว') - (b.status === 'ผ่อนครบแล้ว') || a.date.localeCompare(b.date));
@@ -2106,14 +2129,15 @@
       const debtEnd = m => sum(instDues().filter(d => ymOf(d.date) > m));
       const sc = { 'กำลังผ่อน': 'b-blue', 'ยังไม่เริ่มผ่อน': 'b-yellow', 'ผ่อนครบแล้ว': 'b-green' };
       return {
-        html: `<div class="chips"><div class="chip">หนี้ผ่อนคงเหลือ<b class="down">${baht(sum(L, i => i.remain))}</b></div><div class="chip">ผ่อน ${ymShort(curYM)}<b>${baht(instInMonth(curYM))}</b></div>
- <div class="chip">ผ่อน ${ymShort(addYM(curYM, 1))}<b>${baht(instInMonth(addYM(curYM, 1)))}</b></div><div class="chip">รายการที่กำลังผ่อน<b>${L.filter(i => i.status !== 'ผ่อนครบแล้ว').length}</b></div>
- <button class="btn primary" onclick="instForm()" style="margin-left:auto">+ เพิ่มรายการผ่อน</button></div>
- <div class="card" style="margin-bottom:16px"><h3>รายการผ่อนทั้งหมด</h3><div class="tbl"><div class="tbl-hint">💡 แตะที่แถวเพื่อดูรายละเอียดทั้งหมด / แก้ไข / ลบ</div><table><thead><tr><th>รายการ</th><th class="col-hide-sm">บัตร</th><th class="col-hide-sm">วันที่ซื้อ</th><th class="num col-hide-sm">ยอดซื้อ</th><th class="num col-hide-sm">ดอกเบี้ย</th><th class="num col-hide-sm">ยอดรวมทั้งสิ้น</th><th class="num">ต่องวด</th><th class="col-hide-sm">ความคืบหน้า</th><th class="num col-hide-sm">จ่ายแล้ว</th><th class="num">คงเหลือ</th><th class="col-hide-sm">งวดถัดไป</th><th>สถานะ</th><th class="col-hide-sm"></th><th class="col-show-sm"></th></tr></thead><tbody>
+        html: `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+ <div class="chips" style="margin-bottom:0"><div class="chip">หนี้ผ่อนคงเหลือ<b class="down">${baht(sum(L, i => i.remain))}</b></div><div class="chip">ผ่อน ${ymShort(curYM)}<b>${baht(instInMonth(curYM))}</b></div>
+ <div class="chip">ผ่อน ${ymShort(addYM(curYM, 1))}<b>${baht(instInMonth(addYM(curYM, 1)))}</b></div><div class="chip">รายการที่กำลังผ่อน<b>${L.filter(i => i.status !== 'ผ่อนครบแล้ว').length}</b></div></div>
+ <button class="btn primary" onclick="instForm()" style="white-space:nowrap">+ เพิ่มรายการผ่อน</button></div>
+ <div class="card" style="margin-bottom:16px"><h3><span>รายการผ่อนทั้งหมด</span> <button class="btn primary sm" onclick="instForm()">+ เพิ่มรายการผ่อน</button></h3><div class="tbl"><div class="tbl-hint">💡 แตะที่แถวเพื่อดูรายละเอียดทั้งหมด / แก้ไข / ลบ</div><table><thead><tr><th>รายการ</th><th class="col-hide-sm">บัตร</th><th class="col-hide-sm">วันที่ซื้อ</th><th class="num col-hide-sm">ยอดซื้อ</th><th class="num col-hide-sm">ดอกเบี้ย</th><th class="num col-hide-sm">ยอดรวมทั้งสิ้น</th><th class="num">ต่องวด</th><th class="col-hide-sm">ความคืบหน้า</th><th class="num col-hide-sm">จ่ายแล้ว</th><th class="num">คงเหลือ</th><th class="col-hide-sm">งวดถัดไป</th><th>สถานะ</th><th class="col-hide-sm"></th><th class="col-show-sm"></th></tr></thead><tbody>
  ${L.map(i => `<tr class="clickable-row" onclick="viewInstDetail('${i.id}')"><td><div><b>${esc(i.item)}</b><div class="col-show-sm" style="margin-top:4px;font-size:11px;color:var(--muted)"><span>💳 ${esc(i.card)}</span><div class="bar" style="--c:#6366f1;margin:4px 0 2px;height:7px"><i style="width:${i.done / i.months * 100}%"></i></div><span>งวด ${i.done}/${i.months} (เหลือ ${i.left})</span></div></div></td><td class="col-hide-sm">${esc(i.card)}</td><td class="col-hide-sm">${dLabel(i.date)}</td><td class="num col-hide-sm">${fmt(i.principal)}</td><td class="num col-hide-sm">${i.rate}%</td><td class="num col-hide-sm">${fmt(i.total)}</td><td class="num"><b>${fmt(i.per)}</b></td>
  <td class="col-hide-sm"><div class="bar" style="--c:#6366f1"><i style="width:${i.done / i.months * 100}%"></i></div><small class="hint">${i.done}/${i.months} งวด (เหลือ ${i.left})</small></td>
  <td class="num up col-hide-sm">${fmt(i.paid)}</td><td class="num down"><b>${fmt(i.remain)}</b></td><td class="col-hide-sm">${dLabel(i.next)}</td><td><span class="badge ${sc[i.status]}">${i.status}</span></td>
- <td class="col-hide-sm"><button class="btn sm" onclick="event.stopPropagation();instForm('${i.id}')">แก้ไข</button> <button class="btn sm danger" onclick="event.stopPropagation();del('inst','${i.id}','${esc(i.item)}')">ลบ</button></td><td class="col-show-sm" style="text-align:center"><button class="btn sm" onclick="event.stopPropagation();viewInstDetail('${i.id}')">🔍</button></td></tr>`).join('') || '<tr><td colspan="14" class="empty">ยังไม่มีรายการผ่อน</td></tr>'}
+ <td class="col-hide-sm"><button class="btn sm" onclick="event.stopPropagation();instForm('${i.id}')">แก้ไข</button> <button class="btn sm danger" onclick="event.stopPropagation();del('inst','${i.id}','${esc(i.item)}')">ลบ</button></td><td class="col-show-sm" style="text-align:center"><button class="btn sm" onclick="event.stopPropagation();viewInstDetail('${i.id}')">🔍</button></td></tr>`).join('') || '<tr><td colspan="14" class="empty">ยังไม่มีรายการผ่อน <button class="btn primary sm" onclick="instForm()" style="margin-left:8px">+ เพิ่มรายการผ่อนแรก</button></td></tr>'}
  </tbody></table></div></div>
  <div class="card"><h3>ตารางผ่อนรายเดือน (12 เดือนตั้งแต่ ${ymLabel(curYM)})</h3><div class="tbl"><div class="tbl-hint">💡 เลื่อนซ้าย-ขวาเพื่อดูครบ 12 เดือน หรือแตะที่แถวเพื่อดูสรุป</div><table><thead><tr><th>รายการ</th><th>บัตร</th>${M.map(m => `<th class="num">${ymShort(m)}</th>`).join('')}</tr></thead><tbody>
  ${act.map(i => `<tr class="clickable-row" onclick="viewInstMonths('${i.id}')"><td><b>${esc(i.item)}</b></td><td>${esc(i.card)}</td>${M.map(m => { const v = sum(i.dues.filter(d => ymOf(d.date) === m)); return `<td class="num">${v ? fmt(v) : '<span class="hint">-</span>'}</td>` }).join('')}</tr>`).join('')}
