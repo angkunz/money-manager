@@ -890,21 +890,231 @@
       bottom: 28px;
       left: 50%;
       transform: translate(-50%, 140px);
-      background: #18181b;
+      background: #0f172a;
       color: #fff;
       padding: 11px 22px;
       border-radius: var(--rad-pill);
-      border: 2px solid #38bdf8;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      border: 2.5px solid #000;
+      box-shadow: 4px 4px 0 #000;
       font-weight: 700;
-      font-size: 13px;
-      transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      z-index: 150;
+      font-size: 13.5px;
+      transition: 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 300;
       pointer-events: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      max-width: calc(100vw - 32px);
+      white-space: nowrap;
     }
 
     #toast.show {
       transform: translate(-50%, 0);
+    }
+
+    /* Alert & Confirm Dialog Modal Box */
+    .alert-modal-box {
+      max-width: 440px;
+      text-align: center;
+      padding: 28px 24px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      animation: alertPopIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes alertPopIn {
+      from {
+        opacity: 0;
+        transform: scale(0.88) translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .alert-icon-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 3px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin-bottom: 16px;
+      box-shadow: 3px 3px 0 var(--border);
+      background: var(--yellow-soft);
+      color: var(--text);
+    }
+
+    .alert-icon-wrap.info {
+      background: var(--blue-soft);
+    }
+    .alert-icon-wrap.success {
+      background: var(--inc-soft);
+    }
+    .alert-icon-wrap.warning {
+      background: var(--yellow-soft);
+    }
+    .alert-icon-wrap.danger {
+      background: var(--exp-soft);
+    }
+
+    .alert-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      margin: 0 0 10px;
+      padding: 0;
+      border: none;
+      line-height: 1.3;
+    }
+
+    .alert-message {
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.6;
+      white-space: pre-line;
+      margin-bottom: 20px;
+      font-weight: 500;
+      max-width: 100%;
+      word-break: break-word;
+    }
+
+    .alert-actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .alert-actions .btn {
+      flex: 1;
+      justify-content: center;
+      padding: 11px 16px;
+      font-size: 14px;
+    }
+
+    /* Modern Alert Items / Notification Cards */
+    .alert-box-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      border: 2.5px solid var(--border);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 2.5px 2.5px 0 var(--border);
+      transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .alert-box-item:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3.5px 3.5px 0 var(--border);
+    }
+
+    .alert-box-item.overdue {
+      border-left: 8px solid #f43f5e;
+      background: #fff1f2;
+    }
+
+    .alert-box-item.today {
+      border-left: 8px solid #f97316;
+      background: #fff7ed;
+    }
+
+    .alert-box-item.soon {
+      border-left: 8px solid #f59e0b;
+      background: #fefce8;
+    }
+
+    .alert-box-item.normal {
+      border-left: 8px solid var(--pri);
+      background: #f8fafc;
+    }
+
+    .alert-box-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      background: #fff;
+      box-shadow: 1.5px 1.5px 0 var(--border);
+    }
+
+    .alert-box-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .alert-box-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .alert-box-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .alert-box-sub {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .alert-box-amt {
+      color: var(--exp);
+      font-size: 13px;
+    }
+
+    .alert-box-act {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    @media (max-width: 600px) {
+      .alert-box-item {
+        padding: 12px;
+        gap: 10px;
+      }
+      .alert-box-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 17px;
+        border-radius: 10px;
+      }
+      .alert-box-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      .alert-box-top .badge {
+        font-size: 10px;
+        padding: 2px 8px;
+      }
+      .alert-box-act .btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
     }
 
     .tabs {
@@ -1485,6 +1695,24 @@
       <div class="actions" id="detailActions" style="margin-top:16px"></div>
     </div>
   </div>
+
+  <!-- Custom Alert & Confirm Dialog Modal -->
+  <div class="modal" id="alertModal" style="z-index:200" onclick="if(event.target===this&&!alertModalLock)closeAlertModal(false)">
+    <div class="modal-box alert-modal-box">
+      <div class="alert-icon-wrap" id="alertIconWrap">
+        <span id="alertIcon">🔔</span>
+      </div>
+      <h3 class="alert-title" id="alertTitle">แจ้งเตือน</h3>
+      <div class="alert-message" id="alertMessage"></div>
+      <div id="alertInputWrap" style="display:none;margin-top:4px;margin-bottom:18px;width:100%">
+        <input type="text" id="alertInput" style="width:100%;font-size:15px;padding:10px 14px" />
+      </div>
+      <div class="alert-actions" id="alertActions">
+        <button type="button" class="btn ghost" id="alertCancelBtn" onclick="closeAlertModal(false)">ยกเลิก</button>
+        <button type="button" class="btn primary" id="alertOkBtn">ตกลง</button>
+      </div>
+    </div>
+  </div>
   <div id="toast"></div>
 
   <script>
@@ -1512,7 +1740,134 @@
     const ymShort = ym => { const [y, m] = ym.split('-').map(Number); return `${TH_M[m - 1]} ${String(y + 543).slice(2)}` };
     const dLabel = s => { if (!s) return '-'; const d = parse(s); return `${d.getDate()} ${TH_M[d.getMonth()]} ${String(d.getFullYear() + 543).slice(2)}` };
     const sum = (a, f = x => x.amount) => a.reduce((s, x) => s + (+f(x) || 0), 0);
-    function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200) }
+
+    /* ================= ALERT & CONFIRM MODALS & TOAST ================= */
+    let alertModalResolve = null, alertModalLock = false;
+    function closeAlertModal(val) {
+      const m = $('#alertModal');
+      m.classList.remove('show');
+      if (alertModalResolve) {
+        const r = alertModalResolve;
+        alertModalResolve = null;
+        r(val);
+      }
+    }
+
+    function customAlert(msg, opts = {}) {
+      return new Promise(resolve => {
+        alertModalResolve = resolve;
+        alertModalLock = !!opts.lock;
+        const type = opts.type || (msg.includes('สำเร็จ') ? 'success' : msg.includes('ไม่สำเร็จ') || msg.includes('ผิดพลาด') ? 'danger' : 'warning');
+        const icon = opts.icon || (type === 'success' ? '✅' : type === 'danger' ? '⚠️' : type === 'info' ? 'ℹ️' : '🔔');
+        const title = opts.title || (type === 'success' ? 'สำเร็จ' : type === 'danger' ? 'ข้อผิดพลาด' : 'แจ้งเตือน');
+
+        const wrap = $('#alertIconWrap');
+        wrap.className = 'alert-icon-wrap ' + type;
+        $('#alertIcon').textContent = icon;
+        $('#alertTitle').textContent = title;
+        $('#alertMessage').textContent = msg;
+        $('#alertInputWrap').style.display = 'none';
+
+        const cancelBtn = $('#alertCancelBtn');
+        const okBtn = $('#alertOkBtn');
+        cancelBtn.style.display = 'none';
+        okBtn.textContent = opts.okText || 'ตกลง';
+        okBtn.className = 'btn primary';
+        okBtn.onclick = () => closeAlertModal(true);
+
+        $('#alertModal').classList.add('show');
+        setTimeout(() => okBtn.focus(), 50);
+      });
+    }
+
+    function customConfirm(msg, opts = {}) {
+      return new Promise(resolve => {
+        alertModalResolve = resolve;
+        alertModalLock = !!opts.lock;
+        const type = opts.danger ? 'danger' : opts.type || 'warning';
+        const icon = opts.icon || (opts.danger ? '🗑️' : '❓');
+        const title = opts.title || (opts.danger ? 'ยืนยันการลบ' : 'ยืนยันการทำรายการ');
+
+        const wrap = $('#alertIconWrap');
+        wrap.className = 'alert-icon-wrap ' + type;
+        $('#alertIcon').textContent = icon;
+        $('#alertTitle').textContent = title;
+        $('#alertMessage').textContent = msg;
+        $('#alertInputWrap').style.display = 'none';
+
+        const cancelBtn = $('#alertCancelBtn');
+        const okBtn = $('#alertOkBtn');
+        cancelBtn.style.display = '';
+        cancelBtn.textContent = opts.cancelText || 'ยกเลิก';
+        cancelBtn.onclick = () => closeAlertModal(false);
+
+        okBtn.textContent = opts.okText || (opts.danger ? 'ลบข้อมูล' : 'ตกลง');
+        okBtn.className = 'btn ' + (opts.danger ? 'danger' : 'primary');
+        okBtn.onclick = () => closeAlertModal(true);
+
+        $('#alertModal').classList.add('show');
+        setTimeout(() => okBtn.focus(), 50);
+      });
+    }
+
+    function customPrompt(msg, defVal = '', opts = {}) {
+      return new Promise(resolve => {
+        alertModalResolve = resolve;
+        alertModalLock = !!opts.lock;
+        const type = opts.type || 'info';
+        const icon = opts.icon || '💰';
+        const title = opts.title || 'ระบุจำนวนเงิน';
+
+        const wrap = $('#alertIconWrap');
+        wrap.className = 'alert-icon-wrap ' + type;
+        $('#alertIcon').textContent = icon;
+        $('#alertTitle').textContent = title;
+        $('#alertMessage').textContent = msg;
+
+        const inputWrap = $('#alertInputWrap');
+        const input = $('#alertInput');
+        inputWrap.style.display = 'block';
+        input.value = defVal;
+        if (opts.inputType) input.type = opts.inputType; else input.type = 'text';
+
+        const cancelBtn = $('#alertCancelBtn');
+        const okBtn = $('#alertOkBtn');
+        cancelBtn.style.display = '';
+        cancelBtn.textContent = opts.cancelText || 'ยกเลิก';
+        cancelBtn.onclick = () => closeAlertModal(null);
+
+        okBtn.textContent = opts.okText || 'ตกลง';
+        okBtn.className = 'btn primary';
+        const submitPrompt = () => {
+          const val = input.value;
+          closeAlertModal(val);
+        };
+        okBtn.onclick = submitPrompt;
+        input.onkeydown = (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); submitPrompt(); }
+          if (e.key === 'Escape') { e.preventDefault(); closeAlertModal(null); }
+        };
+
+        $('#alertModal').classList.add('show');
+        setTimeout(() => { input.focus(); input.select(); }, 50);
+      });
+    }
+
+    window.alert = msg => { customAlert(msg); };
+
+    window.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if ($('#alertModal').classList.contains('show') && !alertModalLock) closeAlertModal(false);
+      }
+    });
+
+    function toast(m, icon = '✓') {
+      const t = $('#toast');
+      t.innerHTML = `<span style="font-size:16px">${icon}</span> <span>${esc(m)}</span>`;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+    }
 
     /* ================= DATA ================= */
     const KEY = 'money-manager-v1', AUTH = 'money-key', CLOUD = location.protocol.startsWith('http');
@@ -1552,7 +1907,13 @@
         const r = await api('data', { method: 'PUT', body: JSON.stringify({ rev: force ? null : REV, data: S }) });
         if (r.status === 409) {
           const j = await r.json();
-          if (confirm('ข้อมูลบนคลาวด์ถูกแก้ไขจากอุปกรณ์อื่น\nตกลง = โหลดข้อมูลล่าสุดจากคลาวด์\nยกเลิก = ใช้ข้อมูลในเครื่องนี้เขียนทับ')) applyRemote(j); else await push(true); return
+          const ok = await customConfirm('ข้อมูลบนคลาวด์ถูกแก้ไขจากอุปกรณ์อื่น\n\n• ตกลง = โหลดข้อมูลล่าสุดจากคลาวด์\n• ยกเลิก = ใช้ข้อมูลในเครื่องนี้เขียนทับ', {
+            title: 'ข้อมูลคลาวด์เปลี่ยนแปลง',
+            icon: '☁️',
+            okText: 'โหลดจากคลาวด์',
+            cancelText: 'เขียนทับ'
+          });
+          if (ok) applyRemote(j); else await push(true); return;
         }
         if (!r.ok) throw new Error(r.status);
         const j = await r.json(); REV = j.rev; localStorage.setItem(KEY + '-rev', REV); dirty(false); setSync('☁️ ซิงก์แล้ว', 'b-green');
@@ -1568,12 +1929,18 @@
       setSync('⏳ กำลังโหลด...', 'b-yellow');
       try {
         const r = await api('data');
-        if (r.status === 404) { await push(true); toast('อัปโหลดข้อมูลขึ้นคลาวด์ครั้งแรกแล้ว'); return }
+        if (r.status === 404) { await push(true); toast('อัปโหลดข้อมูลขึ้นคลาวด์ครั้งแรกแล้ว', '☁️'); return }
         if (!r.ok) throw new Error(r.status);
         const j = await r.json();
         if (dirty()) {
           if (j.rev === REV) return push();
-          if (confirm('มีการแก้ไขในเครื่องนี้ที่ยังไม่ซิงก์ และบนคลาวด์ก็มีการแก้ไขด้วย\nตกลง = ใช้ข้อมูลบนคลาวด์\nยกเลิก = ใช้ข้อมูลในเครื่องนี้เขียนทับ')) applyRemote(j); else push(true); return
+          const ok = await customConfirm('มีการแก้ไขในเครื่องนี้ที่ยังไม่ซิงก์ และบนคลาวด์ก็มีการแก้ไขด้วย\n\n• ตกลง = ใช้ข้อมูลบนคลาวด์\n• ยกเลิก = ใช้ข้อมูลในเครื่องนี้เขียนทับ', {
+            title: 'ข้อมูลขัดแย้งกัน',
+            icon: '⚠️',
+            okText: 'ใช้ข้อมูลบนคลาวด์',
+            cancelText: 'ใช้ข้อมูลในเครื่อง'
+          });
+          if (ok) applyRemote(j); else push(true); return;
         }
         if (j.rev !== REV) applyRemote(j); else setSync('☁️ ซิงก์แล้ว', 'b-green');
       } catch (e) { if (e.message !== 'auth') setSync('⚠️ ออฟไลน์ (บันทึกในเครื่อง)', 'b-red') }
@@ -1735,6 +2102,30 @@
         if (i === 0 || days <= 35) out.push({ kind: 'card', ci, first: i === 0, name: `ชำระ${c.name} (รอบ ${dLabel(p.due)})`, type: 'บัตรเครดิต', amount: p.full + p.inst, due: p.due, days, detail: `รูดเต็ม ${baht(p.full)} + ผ่อน ${baht(p.inst)}` })
       }));
       return out.sort((a, b) => a.days - b.days);
+    }
+    function alertBoxHtml(a, showBtn = false) {
+      const [c, t] = stat(a.days);
+      const sev = a.days < 0 ? 'overdue' : a.days === 0 ? 'today' : a.days <= 7 ? 'soon' : 'normal';
+      const icon = a.kind === 'card' ? '💳' : (a.auto ? '⚡' : '🧾');
+      let btn = '';
+      if (showBtn) {
+        btn = a.kind === 'bill'
+          ? (a.auto ? '<span class="badge b-gray">ตัดอัตโนมัติ</span>' : `<button class="btn sm ok" onclick="payBill('${a.id}','${a.ym}')">ชำระแล้ว</button>`)
+          : (a.first ? `<button class="btn sm ok" onclick="payCard(${a.ci})">ชำระแล้ว</button>` : '');
+      }
+      return `<div class="alert-box-item ${sev}">
+        <div class="alert-box-icon">${icon}</div>
+        <div class="alert-box-body">
+          <div class="alert-box-top">
+            <span class="alert-box-title">${esc(a.name)}</span>
+            <span class="badge ${c}">${t}</span>
+          </div>
+          <div class="alert-box-sub">
+            <span>${a.type}</span> · <span>ครบ ${dLabel(a.due)}</span> · <b class="alert-box-amt">${baht(a.amount)}</b>${a.detail ? `<span class="col-hide-sm"> · ${a.detail}</span>` : ''}
+          </div>
+        </div>
+        ${btn ? `<div class="alert-box-act">${btn}</div>` : ''}
+      </div>`;
     }
     function weeks(ym) {
       const [y, m] = ym.split('-').map(Number), n = dim(y, m), W = [];
@@ -1969,7 +2360,18 @@
       });
     }
     const upsert = (arr, o) => { if (o.id) { const i = arr.findIndex(x => x.id === o.id); arr[i] = o } else { o.id = uid(); arr.push(o) } };
-    function del(arr, id, label) { if (!confirm(`ลบ "${label}" ใช่หรือไม่?`)) return; S[arr] = S[arr].filter(x => x.id !== id); save(); render(); toast('ลบแล้ว') }
+    async function del(arr, id, label) {
+      const ok = await customConfirm(`ต้องการลบ "${label}" ใช่หรือไม่?`, {
+        title: 'ยืนยันการลบ',
+        danger: true,
+        okText: 'ลบข้อมูล'
+      });
+      if (!ok) return;
+      S[arr] = S[arr].filter(x => x.id !== id);
+      save();
+      render();
+      toast('ลบรายการเรียบร้อยแล้ว', '🗑️');
+    }
 
     /* ================= TRANSACTIONS ================= */
     function txForm(id) {
@@ -2043,7 +2445,7 @@
  <div class="card"><h3>🍩 สัดส่วนรายจ่าย ${ymShort(curYM)}</h3><div class="chart"><canvas id="cCat"></canvas></div></div></div>
  <div class="grid g3">
  <div class="card"><h3>🔔 แจ้งเตือน <button class="btn sm" onclick="go('alerts')">ดูทั้งหมด</button></h3>
- ${AL.slice(0, 6).map(a => { const [c, t] = stat(a.days); return `<div class="item"><div class="t"><b>${esc(a.name)}</b><small>${dLabel(a.due)} · ${baht(a.amount)}</small></div><span class="badge ${c}">${t}</span></div>` }).join('') || '<div class="empty">ไม่มีรายการ</div>'}</div>
+ ${AL.slice(0, 6).map(a => alertBoxHtml(a, false)).join('') || '<div class="empty">ไม่มีรายการ</div>'}</div>
  <div class="card"><h3>💳 การใช้วงเงินบัตร</h3>${S.cards.map(c => {
         const s = cardSum(c), col = s.util > 70 ? '#f43f5e' : s.util > 30 ? '#f59e0b' : '#10b981';
         return `<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between"><b>${esc(c.name)}</b><span>${s.util.toFixed(1)}%</span></div>
@@ -2100,9 +2502,14 @@
     }
 
     /* ================= INSTALLMENTS ================= */
-    function instForm(id) {
+    async function instForm(id) {
       if (!S.cards || S.cards.length === 0) {
-        if (confirm('ยังไม่มีข้อมูลบัตรเครดิตในระบบ คุณต้องเพิ่มบัตรเครดิตก่อนบันทึกรายการผ่อน\nต้องการไปที่หน้าเพิ่มบัตรเครดิตเลยหรือไม่?')) {
+        const ok = await customConfirm('ยังไม่มีข้อมูลบัตรเครดิตในระบบ คุณต้องเพิ่มบัตรเครดิตก่อนบันทึกรายการผ่อน\n\nต้องการไปที่หน้าเพิ่มบัตรเครดิตเลยหรือไม่?', {
+          title: 'ยังไม่มีบัตรเครดิต',
+          icon: '💳',
+          okText: 'ไปหน้าเพิ่มบัตร'
+        });
+        if (ok) {
           go('cards');
           cardForm();
         }
@@ -2152,11 +2559,25 @@
       { key: 'paidUntil', label: 'ชำระแล้วถึงรอบวันที่', type: 'date', full: 1, hint: 'รอบบิลที่ครบกำหนดก่อนหรือตรงวันนี้ จะถือว่าชำระแล้ว' }], c,
         o => { if (i != null) { S.cards[i] = o; if (old && old !== o.name) { S.tx.forEach(t => { if (t.method === old) t.method = o.name }); S.inst.forEach(x => { if (x.card === old) x.card = o.name }) } } else { o.id = uid(); S.cards.push(o) } });
     }
-    function payCard(i) {
+    async function payCard(i) {
       const c = S.cards[i], s = cardSum(c); if (!s.next) return;
-      if (confirm(`ยืนยันชำระ ${c.name} ยอด ${baht(s.next.full + s.next.inst)} (ครบกำหนด ${dLabel(s.next.due)})?`)) { c.paidUntil = s.next.due; save(); render(); toast('บันทึกการชำระบัตรแล้ว') }
+      const ok = await customConfirm(`ยืนยันการชำระ ${c.name}\n\nยอดชำระ: ${baht(s.next.full + s.next.inst)}\nครบกำหนด: ${dLabel(s.next.due)}`, {
+        title: 'บันทึกการชำระบัตร',
+        icon: '💳',
+        okText: 'ยืนยันชำระ'
+      });
+      if (ok) { c.paidUntil = s.next.due; save(); render(); toast('บันทึกการชำระบัตรแล้ว', '✅'); }
     }
-    function delCard(i) { if (confirm(`ลบ ${S.cards[i].name}?`)) { S.cards.splice(i, 1); save(); render() } }
+    async function delCard(i) {
+      const c = S.cards[i];
+      if (!c) return;
+      const ok = await customConfirm(`ต้องการลบบัตรเครดิต "${c.name}" ใช่หรือไม่?`, {
+        title: 'ยืนยันการลบบัตร',
+        danger: true,
+        okText: 'ลบบัตร'
+      });
+      if (ok) { S.cards.splice(i, 1); save(); render(); toast('ลบบัตรเรียบร้อยแล้ว', '💳'); }
+    }
     function pgCards() {
       const G = [['#4f46e5', '#7c3aed'], ['#db2777', '#f97316'], ['#0891b2', '#10b981'], ['#334155', '#0f172a']];
       return {
@@ -2182,22 +2603,30 @@
       { key: 'nature', label: 'ลักษณะ', type: 'select', options: ['คงที่', 'ผันผวน'] }, { key: 'amount', label: 'จำนวนเงิน (โดยประมาณ)', type: 'number', req: 1 },
       { key: 'day', label: 'ครบกำหนดทุกวันที่', type: 'number', min: 1, max: 31, req: 1 }, { key: 'auto', label: 'ตัดอัตโนมัติ', type: 'select', options: ['ไม่ใช่', 'ใช่'] }], b, o => upsert(S.bills, o));
     }
-    function payBill(id, ym) {
-      const b = S.bills.find(x => x.id === id); b.paid.push(ym);
-      if (b.auto !== 'ใช่' && confirm(`บันทึก "${b.name}" ${baht(b.amount)} เป็นรายจ่ายด้วยไหม?`))
-        S.tx.push({ id: uid(), date: today(), type: 'รายจ่าย', nature: b.nature, category: b.category, desc: b.name, freq: 'รายเดือน', method: 'โอน', amount: b.amount, note: 'บันทึกจากแจ้งเตือน' });
-      save(); render(); toast('ทำเครื่องหมายชำระแล้ว');
+    async function payBill(id, ym) {
+      const b = S.bills.find(x => x.id === id);
+      if (!b) return;
+      if (!Array.isArray(b.paid)) b.paid = [];
+      if (!b.paid.includes(ym)) b.paid.push(ym);
+      if (b.auto !== 'ใช่') {
+        const addTx = await customConfirm(`ต้องการบันทึก "${b.name}" ${baht(b.amount)} ลงในรายการรายจ่ายด้วยหรือไม่?`, {
+          title: 'บันทึกลงรายจ่าย',
+          icon: '🧾',
+          okText: 'บันทึกด้วย',
+          cancelText: 'ไม่บันทึก'
+        });
+        if (addTx) {
+          S.tx.push({ id: uid(), date: today(), type: 'รายจ่าย', nature: b.nature, category: b.category, desc: b.name, freq: 'รายเดือน', method: 'โอน', amount: b.amount, note: 'บันทึกจากแจ้งเตือน' });
+        }
+      }
+      save(); render(); toast('ทำเครื่องหมายชำระแล้ว', '✅');
     }
     function pgAlerts() {
       const A = alerts(), cnt = k => A.filter(k).length;
       return {
         html: `<div class="grid g6">${kpi('เกินกำหนด', cnt(a => a.days < 0), null, '#f43f5e', 1, fmt, 'รายการ')}${kpi('ครบกำหนดวันนี้', cnt(a => a.days === 0), null, '#f97316', 1, fmt, 'รายการ')}
  ${kpi('ภายใน 7 วัน', cnt(a => a.days > 0 && a.days <= 7), null, '#f59e0b', 1, fmt, 'รายการ')}${kpi('ยอดที่ต้องจ่ายใน 30 วัน', sum(A.filter(a => a.days <= 30)), null, 'var(--pri)', 1, baht, 'รวมบัตรและบิล')}</div>
- <div class="grid g11"><div class="card"><h3>🔔 รายการที่ต้องชำระ</h3>${A.map(a => {
-          const [c, t] = stat(a.days);
-          const btn = a.kind === 'bill' ? (a.auto ? '<span class="badge b-gray">ตัดอัตโนมัติ</span>' : `<button class="btn sm ok" onclick="payBill('${a.id}','${a.ym}')">ชำระแล้ว</button>`) : (a.first ? `<button class="btn sm ok" onclick="payCard(${a.ci})">ชำระแล้ว</button>` : '');
-          return `<div class="item"><div class="t"><b>${esc(a.name)}</b><small>${a.type} · ครบ ${dLabel(a.due)} · <b>${baht(a.amount)}</b>${a.detail ? ' · ' + a.detail : ''}</small></div><span class="badge ${c}">${t}</span>${btn}</div>`
-        }).join('') || '<div class="empty">ไม่มีรายการ</div>'}</div>
+ <div class="grid g11"><div class="card"><h3>🔔 รายการที่ต้องชำระ</h3>${A.map(a => alertBoxHtml(a, true)).join('') || '<div class="empty">ไม่มีรายการ</div>'}</div>
  <div class="card"><h3>📋 รายการที่ต้องจ่ายประจำ <button class="btn sm primary" onclick="billForm()">+ เพิ่ม</button></h3><div class="tbl"><div class="tbl-hint">💡 แตะที่แถวเพื่อดูรายละเอียด / แก้ไข / ลบ</div><table><thead><tr><th>รายการ</th><th class="col-hide-sm">หมวด</th><th class="num">จำนวน</th><th>วันที่</th><th class="col-hide-sm"></th><th class="col-show-sm"></th></tr></thead><tbody>
  ${S.bills.map(b => `<tr class="clickable-row" onclick="viewBillDetail('${b.id}')"><td><div><b>${esc(b.name)}</b> ${b.auto === 'ใช่' ? '<span class="badge b-gray" style="padding:1px 6px;font-size:10px">อัตโนมัติ</span>' : ''}<div class="col-show-sm" style="font-size:11px;color:var(--muted)">${esc(b.category)}</div></div></td><td class="col-hide-sm">${esc(b.category)}</td><td class="num"><b>${fmt(b.amount)}</b></td><td>ทุกวันที่ ${b.day}</td>
  <td class="col-hide-sm"><button class="btn sm" onclick="event.stopPropagation();billForm('${b.id}')">แก้ไข</button> <button class="btn sm danger" onclick="event.stopPropagation();del('bills','${b.id}','${esc(b.name)}')">ลบ</button></td><td class="col-show-sm" style="text-align:center"><button class="btn sm" onclick="event.stopPropagation();viewBillDetail('${b.id}')">🔍</button></td></tr>`).join('')}</tbody></table></div></div></div>`
@@ -2277,7 +2706,22 @@
       const g = S.goals.find(x => x.id === id) || { saved: 0 };
       openForm(id ? 'แก้ไขเป้าหมาย' : 'เพิ่มเป้าหมายการออม', [{ key: 'name', label: 'ชื่อเป้าหมาย', req: 1, full: 1 }, { key: 'target', label: 'ยอดเป้าหมาย', type: 'number', req: 1 }, { key: 'saved', label: 'ออมแล้ว', type: 'number' }, { key: 'deadline', label: 'กำหนดเสร็จ', type: 'date', req: 1 }], g, o => upsert(S.goals, o))
     }
-    function addSave(id) { const g = S.goals.find(x => x.id === id), v = parseFloat(prompt(`ฝากเพิ่มเข้า "${g.name}" (บาท)`)); if (!v) return; g.saved += v; save(); render(); toast(`เพิ่ม ${baht(v)} แล้ว`) }
+    async function addSave(id) {
+      const g = S.goals.find(x => x.id === id);
+      if (!g) return;
+      const val = await customPrompt(`ระบุจำนวนเงินที่ต้องการฝากเพิ่มเข้า "${g.name}"\n(เป้าหมาย: ${baht(g.target)} / ปัจจุบัน: ${baht(g.saved)})`, '', {
+        title: 'ฝากเงินเพิ่ม',
+        icon: '💰',
+        inputType: 'number',
+        okText: 'ฝากเงิน'
+      });
+      const v = parseFloat(val);
+      if (!v || isNaN(v) || v <= 0) return;
+      g.saved += v;
+      save();
+      render();
+      toast(`เพิ่ม ${baht(v)} เข้าเป้าหมายแล้ว`, '💰');
+    }
     function pgGoals() {
       const ref = today(), avgInc = (L => sum(L.slice(-3), x => x.inc) / Math.max(1, Math.min(3, L.length)))(ledgerTo(ymOf(ref)).list);
       return {
@@ -2305,11 +2749,47 @@
       const rows = [...S.tx].sort((a, b) => a.date.localeCompare(b.date)).map(t => [t.date, t.type, t.nature, t.category, t.desc, t.freq, t.method, t.amount, t.note].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
       dl(`transactions-${today()}.csv`, '\ufeff' + [h.join(','), ...rows].join('\n'), 'text/csv')
     }
-    function importJSON(f) { const r = new FileReader(); r.onload = () => { try { const d = JSON.parse(r.result); if (!d.tx) throw 0; S = d; save(); curYM = ymOf(today()); updateMonthSel(); render(); toast('นำเข้าข้อมูลสำเร็จ') } catch (e) { alert('ไฟล์ไม่ถูกต้อง') } }; r.readAsText(f) }
-    function resetData(sampleData) {
-      if (!confirm(sampleData ? 'โหลดข้อมูลตัวอย่างทับข้อมูลปัจจุบัน?' : 'ลบข้อมูลทั้งหมด (ไม่สามารถกู้คืนได้)?')) return;
-      if (sampleData) S = sample(); else { const s = sample(); S = { settings: { ...s.settings, opening: 0, startMonth: ymOf(ymd(new Date())), refDate: '' }, tx: [], cards: s.cards.map(c => ({ ...c, paidUntil: '' })), inst: [], bills: [], goals: [] } }
-      save(); curYM = ymOf(today()); updateMonthSel(); render(); toast('เรียบร้อย')
+    function importJSON(f) {
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const d = JSON.parse(r.result);
+          if (!d.tx) throw 0;
+          S = d;
+          save();
+          curYM = ymOf(today());
+          updateMonthSel();
+          render();
+          toast('นำเข้าข้อมูลสำเร็จ', '📥');
+        } catch (e) {
+          customAlert('ไฟล์สำรองข้อมูลไม่ถูกต้อง กรุณาเลือกไฟล์ JSON ที่ส่งออกจากระบบ', { title: 'นำเข้าข้อมูลไม่สำเร็จ', type: 'danger', icon: '❌' });
+        }
+      };
+      r.readAsText(f);
+    }
+    async function resetData(sampleData) {
+      const ok = await customConfirm(
+        sampleData
+          ? 'ต้องการโหลดข้อมูลตัวอย่างทับข้อมูลปัจจุบันหรือไม่?'
+          : 'ต้องการล้างข้อมูลทั้งหมดในระบบใช่หรือไม่?\n\n⚠️ ข้อมูลทั้งหมดจะถูกลบและไม่สามารถกู้คืนได้',
+        {
+          title: sampleData ? 'โหลดข้อมูลตัวอย่าง' : 'ล้างข้อมูลทั้งหมด',
+          danger: !sampleData,
+          icon: sampleData ? '📦' : '⚠️',
+          okText: sampleData ? 'โหลดข้อมูล' : 'ล้างข้อมูลทั้งหมด'
+        }
+      );
+      if (!ok) return;
+      if (sampleData) S = sample();
+      else {
+        const s = sample();
+        S = { settings: { ...s.settings, opening: 0, startMonth: ymOf(ymd(new Date())), refDate: '' }, tx: [], cards: s.cards.map(c => ({ ...c, paidUntil: '' })), inst: [], bills: [], goals: [] };
+      }
+      save();
+      curYM = ymOf(today());
+      updateMonthSel();
+      render();
+      toast('จัดการข้อมูลเรียบร้อยแล้ว', '✨');
     }
     function pgSettings() {
       const s = S.settings;
@@ -2338,13 +2818,16 @@
     const NS = () => ({ ...NDEF, ...(S.settings.notify || {}) });
     function setN(k, v) { S.settings.notify = { ...NS(), [k]: v }; save(); toast('บันทึกการตั้งค่าแจ้งเตือนแล้ว') }
     async function sendNow(mode) {
-      if (!CLOUD || !localStorage.getItem(AUTH)) return alert('ต้องเปิดแอปผ่าน Netlify และเข้าสู่ระบบก่อน');
-      toast('กำลังส่ง...'); clearTimeout(saveT); if (dirty()) await push();
+      if (!CLOUD || !localStorage.getItem(AUTH)) {
+        return customAlert('ต้องเปิดแอปผ่าน Netlify และเข้าสู่ระบบ (กรอกรหัสผ่าน APP_PIN) ก่อนจึงจะสามารถส่งแจ้งเตือนได้', { title: 'ยังไม่ได้เข้าสู่ระบบ', type: 'warning', icon: '🔐' });
+      }
+      toast('กำลังส่ง...', '⏳'); clearTimeout(saveT); if (dirty()) await push();
       try {
         const r = await api('notify', { method: 'POST', body: JSON.stringify({ mode }) }); const j = await r.json();
-        if (r.ok) toast('ส่งเข้า Google Chat แล้ว ✓'); else alert('ส่งไม่สำเร็จ: ' + (j.error || 'HTTP ' + j.status))
+        if (r.ok) toast('ส่งเข้า Google Chat แล้ว ✓', '🔔');
+        else customAlert('ส่งไม่สำเร็จ: ' + (j.error || 'HTTP ' + j.status), { title: 'ส่งแจ้งเตือนไม่สำเร็จ', type: 'danger', icon: '❌' });
       }
-      catch (e) { if (e.message !== 'auth') toast('ส่งไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต') }
+      catch (e) { if (e.message !== 'auth') toast('ส่งไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต', '⚠️'); }
     }
     function notifyCard() {
       const n = NS(), yn = (k, l) => `<label><span>${l}</span><select onchange="setN('${k}',this.value==='1')"><option value="1" ${n[k] ? 'selected' : ''}>เปิด</option><option value="0" ${!n[k] ? 'selected' : ''}>ปิด</option></select></label>`;
