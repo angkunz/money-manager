@@ -618,7 +618,11 @@
         <h1 id="pageTitle"></h1>
         <div class="sub" id="refInfo"></div>
       </div>
-      <div class="tools"><span id="sync" class="badge b-gray">ออฟไลน์</span>
+      <div class="tools">
+        <input type="month" id="monthSel">
+        <button class="btn primary" onclick="txForm()">+ บันทึกรายการ</button>
+        <span id="sync" class="badge b-gray" style="cursor:pointer" onclick="askKey()" title="สถานะการซิงก์คลาวด์ (คลิกเพื่อเข้าสู่ระบบ)">📴 โหมดออฟไลน์</span>
+      </div>
     </header>
     <div id="content"></div>
   </main>
@@ -662,7 +666,15 @@
     let S = load(), REV = +localStorage.getItem(KEY + '-rev') || 0, saveT = null;
     function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.tx) return s } catch (e) { } return sample() }
     const dirty = v => v === undefined ? localStorage.getItem(KEY + '-dirty') === '1' : localStorage.setItem(KEY + '-dirty', v ? '1' : '0');
-    function setSync(t, c) { const e = $('#sync'); if (e) { e.textContent = t; e.className = 'badge ' + c } }
+    function setSync(t, c) {
+      const e = $('#sync');
+      if (e) {
+        e.textContent = t;
+        e.className = 'badge ' + c;
+        e.style.cursor = 'pointer';
+        e.onclick = askKey;
+      }
+    }
     function save() {
       localStorage.setItem(KEY, JSON.stringify(S)); dirty(true);
       if (!CLOUD || !localStorage.getItem(AUTH)) return;
@@ -670,7 +682,13 @@
     }
     async function api(path, opt = {}) {
       const r = await fetch('/api/' + path, { ...opt, headers: { 'content-type': 'application/json', 'x-app-key': localStorage.getItem(AUTH) || '' } });
-      if (r.status === 401) { localStorage.removeItem(AUTH); askKey(); throw new Error('auth') }
+      if (r.status === 401) {
+        localStorage.removeItem(AUTH);
+        setSync('🔐 รหัสผ่านไม่ถูกต้อง (คลิกเพื่อเข้าสู่ระบบ)', 'b-red');
+        toast('⚠️ รหัสผ่านไม่ถูกต้อง หรือยังไม่ได้ตั้งค่า APP_PIN บน Netlify');
+        askKey();
+        throw new Error('auth');
+      }
       return r;
     }
     async function push(force) {
@@ -688,7 +706,10 @@
     function applyRemote(j) { S = j.data; REV = j.rev; localStorage.setItem(KEY, JSON.stringify(S)); localStorage.setItem(KEY + '-rev', REV); dirty(false); render(); setSync('☁️ ซิงก์แล้ว', 'b-green') }
     async function pull() {
       if (!CLOUD) return setSync('📴 โหมดออฟไลน์', 'b-gray');
-      if (!localStorage.getItem(AUTH)) return askKey();
+      if (!localStorage.getItem(AUTH)) {
+        setSync('🔐 คลิกเพื่อเข้าสู่ระบบ', 'b-gray');
+        return askKey();
+      }
       setSync('⏳ กำลังโหลด...', 'b-yellow');
       try {
         const r = await api('data');
@@ -704,24 +725,23 @@
     }
     function askKey() {
       if (!CLOUD) return;
-      openForm('🔐 เข้าสู่ระบบ', [
-        { key: 'k', label: 'รหัสผ่านแอป (APP_PIN ที่ตั้งไว้ใน Netlify)', type: 'password', req: true, full: true }
+      openForm('🔐 เข้าสู่ระบบ (ซิงก์ข้อมูลคลาวด์)', [
+        { key: 'k', label: 'รหัสผ่านแอป (APP_PIN ที่ตั้งไว้ใน Netlify)', type: 'password', req: true, full: true, hint: 'กรอกรหัสเดียวกับตัวแปร APP_PIN ใน Netlify Site configuration' }
       ], {}, o => {
         localStorage.setItem(AUTH, o.k.trim());
         closeModal();
         pull();
       }, () => {
-        // โค้ดที่จะรันหลังเปิด Modal สำเร็จ เพื่อใส่ลิงก์ปุ่มยกเลิกให้ถูกต้อง
         const box = $('#mForm');
         if (box) {
           const cancelBtn = box.querySelector('.btn.ghost');
           if (cancelBtn) {
-            cancelBtn.onclick = () => { closeModal(); setSync('📴 ใช้แบบออฟไลน์', 'b-gray'); };
+            cancelBtn.onclick = () => { closeModal(); setSync('📴 ใช้แบบออฟไลน์ (คลิกเพื่อเชื่อมต่อคลาวด์)', 'b-gray'); };
           }
         }
       });
     }
-    function logout() { localStorage.removeItem(AUTH); setSync('📴 ออกจากระบบแล้ว', 'b-gray'); askKey() }
+    function logout() { localStorage.removeItem(AUTH); setSync('📴 ออกจากระบบแล้ว (คลิกเพื่อเข้าสู่ระบบ)', 'b-gray'); askKey() }
     const today = () => S.settings.refDate || ymd(new Date());
     const methods = () => ['เงินสด', 'โอน', ...S.cards.map(c => c.name)];
 
@@ -1213,7 +1233,8 @@
     }
 
     /* ================= SETTINGS ================= */
-    function setS(k, v) { S.settings[k] = v; save(); if (k === 'refDate') { curYM = ymOf(today()); $('#monthSel').value = curYM } render(); toast('บันทึกการตั้งค่าแล้ว') }
+    function updateMonthSel() { const m = $('#monthSel'); if (m) m.value = curYM; }
+    function setS(k, v) { S.settings[k] = v; save(); if (k === 'refDate') { curYM = ymOf(today()); updateMonthSel() } render(); toast('บันทึกการตั้งค่าแล้ว') }
     function setCats(k, v) { S.settings.cats[k] = v.split(/[,\n]/).map(s => s.trim()).filter(Boolean); save(); render(); toast('อัปเดตหมวดหมู่แล้ว') }
     function dl(name, data, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type })); a.download = name; a.click() }
     function exportJSON() { dl(`money-backup-${today()}.json`, JSON.stringify(S, null, 1), 'application/json') }
@@ -1222,11 +1243,11 @@
       const rows = [...S.tx].sort((a, b) => a.date.localeCompare(b.date)).map(t => [t.date, t.type, t.nature, t.category, t.desc, t.freq, t.method, t.amount, t.note].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
       dl(`transactions-${today()}.csv`, '\ufeff' + [h.join(','), ...rows].join('\n'), 'text/csv')
     }
-    function importJSON(f) { const r = new FileReader(); r.onload = () => { try { const d = JSON.parse(r.result); if (!d.tx) throw 0; S = d; save(); curYM = ymOf(today()); $('#monthSel').value = curYM; render(); toast('นำเข้าข้อมูลสำเร็จ') } catch (e) { alert('ไฟล์ไม่ถูกต้อง') } }; r.readAsText(f) }
+    function importJSON(f) { const r = new FileReader(); r.onload = () => { try { const d = JSON.parse(r.result); if (!d.tx) throw 0; S = d; save(); curYM = ymOf(today()); updateMonthSel(); render(); toast('นำเข้าข้อมูลสำเร็จ') } catch (e) { alert('ไฟล์ไม่ถูกต้อง') } }; r.readAsText(f) }
     function resetData(sampleData) {
       if (!confirm(sampleData ? 'โหลดข้อมูลตัวอย่างทับข้อมูลปัจจุบัน?' : 'ลบข้อมูลทั้งหมด (ไม่สามารถกู้คืนได้)?')) return;
       if (sampleData) S = sample(); else { const s = sample(); S = { settings: { ...s.settings, opening: 0, startMonth: ymOf(ymd(new Date())), refDate: '' }, tx: [], cards: s.cards.map(c => ({ ...c, paidUntil: '' })), inst: [], bills: [], goals: [] } }
-      save(); curYM = ymOf(today()); $('#monthSel').value = curYM; render(); toast('เรียบร้อย')
+      save(); curYM = ymOf(today()); updateMonthSel(); render(); toast('เรียบร้อย')
     }
     function pgSettings() {
       const s = S.settings;
@@ -1291,8 +1312,12 @@
       $('#refInfo').textContent = `ข้อมูล ณ ${dLabel(today())} · กำลังดู ${ymLabel(curYM)}`;
       const r = fn(); $('#content').innerHTML = r.html; r.after && r.after(); renderNav();
     }
-    curYM = ymOf(today()); $('#monthSel').value = curYM;
-    $('#monthSel').onchange = e => { if (e.target.value) { curYM = e.target.value; render() } };
+    curYM = ymOf(today());
+    const ms = $('#monthSel');
+    if (ms) {
+      ms.value = curYM;
+      ms.onchange = e => { if (e.target.value) { curYM = e.target.value; render() } };
+    }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() });
     render();
     pull();
