@@ -464,6 +464,88 @@
       color: var(--text);
     }
 
+    /* Segmented Control / Button Group (for 2-3 static options instead of dropdown) */
+    .segmented-group {
+      display: flex;
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: var(--rad-sm);
+      background: #f1f5f9;
+      padding: 3px;
+      gap: 3px;
+      box-shadow: var(--shadow-sm);
+      box-sizing: border-box;
+      min-height: 42px;
+      align-items: stretch;
+    }
+
+    .segmented-btn {
+      flex: 1;
+      border: 2px solid transparent;
+      background: transparent;
+      color: #64748b;
+      font: inherit;
+      font-size: 13.5px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: all 0.12s ease;
+      user-select: none;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    .segmented-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--text);
+    }
+
+    .segmented-btn.active {
+      background: #ffffff;
+      color: var(--text);
+      border-color: var(--border);
+      font-weight: 800;
+      box-shadow: 2px 2px 0 var(--border);
+    }
+
+    /* Distinct active color accents */
+    .segmented-btn.active.theme-inc {
+      background: #dcfce7;
+      color: #166534;
+      border-color: var(--border);
+    }
+
+    .segmented-btn.active.theme-exp {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: var(--border);
+    }
+
+    .segmented-btn.active.theme-fix {
+      background: #e0f2fe;
+      color: #075985;
+      border-color: var(--border);
+    }
+
+    .segmented-btn.active.theme-var {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: var(--border);
+    }
+
+    .segmented-group.disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      filter: grayscale(0.85);
+      cursor: not-allowed;
+    }
+
     /* Grid Layouts */
     .grid {
       display: grid;
@@ -2372,9 +2454,63 @@
       };
       $('#modal').classList.add('show'); after && after();
     }
+    const OPT_ICONS = {
+      'รายรับ': '💰 รายรับ',
+      'รายจ่าย': '💸 รายจ่าย',
+      'คงที่': '📌 คงที่',
+      'ผันผวน': '🌊 ผันผวน',
+      'ใช่': '✓ ใช่',
+      'ไม่ใช่': '✕ ไม่ใช่',
+      'เปิด': '✓ เปิด',
+      'ปิด': '✕ ปิด'
+    };
+    const OPT_THEMES = {
+      'รายรับ': 'theme-inc',
+      'รายจ่าย': 'theme-exp',
+      'คงที่': 'theme-fix',
+      'ผันผวน': 'theme-var',
+      'ใช่': 'theme-inc',
+      'เปิด': 'theme-inc'
+    };
+    function setSeg(name, val, btn) {
+      const form = btn.closest('form') || btn.closest('.card') || document;
+      const input = form.querySelector(`input[name="${name}"]`);
+      if (input) {
+        input.value = val;
+      }
+      const group = btn.closest('.segmented-group');
+      if (group) {
+        group.querySelectorAll('.segmented-btn').forEach(b => {
+          const act = b.dataset.val === val;
+          b.classList.toggle('active', act);
+          const theme = b.dataset.theme;
+          if (theme) {
+            b.classList.toggle(theme, act);
+          }
+        });
+      }
+      if (input) {
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        if (input.onchange) input.onchange();
+      }
+    }
     function inp(f, v) {
       v = v ?? f.def ?? '';
-      if (f.type === 'select') return `<select name="${f.key}">${f.options.map(o => `<option ${o == v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+      if (f.type === 'select') {
+        if (f.options && f.options.length >= 2 && f.options.length <= 3 && f.key !== 'card' && f.key !== 'category' && f.key !== 'method') {
+          const cur = (v !== '' && v != null) ? v : f.options[0];
+          return `<div class="segmented-group" id="seg-${f.key}">
+            <input type="hidden" name="${f.key}" value="${esc(cur)}">
+            ${f.options.map(o => {
+              const act = (o === cur);
+              const theme = OPT_THEMES[o] || '';
+              const label = OPT_ICONS[o] || esc(o);
+              return `<button type="button" class="segmented-btn ${act ? 'active ' + theme : ''}" data-val="${esc(o)}" data-theme="${theme}" onclick="setSeg('${f.key}','${esc(o)}',this)">${label}</button>`;
+            }).join('')}
+          </div>`;
+        }
+        return `<select name="${f.key}">${f.options.map(o => `<option ${o == v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+      }
       return `<input name="${f.key}" type="${f.type || 'text'}" value="${esc(v)}" ${f.req ? 'required' : ''} ${f.type === 'number' ? 'step="any"' : ''} ${f.min != null ? `min="${f.min}"` : ''} ${f.max != null ? `max="${f.max}"` : ''}>`;
     }
     function closeModal() { $('#modal').classList.remove('show') }
@@ -2588,11 +2724,30 @@
         { key: 'note', label: 'หมายเหตุ', full: 1 }], t,
         o => { if (o.type === 'รายรับ') o.nature = '-'; upsert(S.tx, o) },
         () => {
-          const f = $('#mForm'); const sync = () => {
-            const inc = f.type.value === 'รายรับ'; const list = S.settings.cats[inc ? 'income' : 'expense'];
-            f.category.innerHTML = list.map(c => `<option ${c === t.category ? 'selected' : ''}>${esc(c)}</option>`).join(''); f.nature.disabled = inc
+          const f = $('#mForm');
+          const sync = () => {
+            const inc = f.type.value === 'รายรับ';
+            const list = S.settings.cats[inc ? 'income' : 'expense'];
+            f.category.innerHTML = list.map(c => `<option ${c === t.category ? 'selected' : ''}>${esc(c)}</option>`).join('');
+            f.nature.disabled = inc;
+            const segNature = $('#seg-nature');
+            if (segNature) {
+              segNature.classList.toggle('disabled', inc);
+              if (inc) {
+                segNature.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('active', 'theme-fix', 'theme-var'));
+              } else {
+                const cur = (f.nature.value && f.nature.value !== '-') ? f.nature.value : (t.nature && t.nature !== '-' ? t.nature : 'ผันผวน');
+                f.nature.value = cur;
+                segNature.querySelectorAll('.segmented-btn').forEach(b => {
+                  const act = b.dataset.val === cur;
+                  b.classList.toggle('active', act);
+                  if (b.dataset.theme) b.classList.toggle(b.dataset.theme, act);
+                });
+              }
+            }
           };
-          f.type.onchange = sync; sync()
+          f.type.onchange = sync;
+          sync();
         });
     }
     let txF = { type: '', nature: '', cat: '', q: '', all: false };
@@ -2601,11 +2756,26 @@
       const L = S.tx.filter(t => (txF.all || ymOf(t.date) === curYM) && (!txF.type || t.type === txF.type) && (!txF.nature || t.nature === txF.nature) && (!txF.cat || t.category === txF.cat) && (!q || (t.desc + t.note + t.category).toLowerCase().includes(q))).sort((a, b) => b.date.localeCompare(a.date));
       const inc = sum(L.filter(t => t.type === 'รายรับ')), exp = sum(L.filter(t => t.type === 'รายจ่าย')), cats = [...S.settings.cats.income, ...S.settings.cats.expense];
       const sel = (k, opts, ph) => `<select onchange="txF.${k}=this.value;render()"><option value="">${ph}</option>${opts.map(o => `<option ${txF[k] === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+      const filterSeg = (k, opts, allLabel) => {
+        const cur = txF[k] || '';
+        const items = [{ val: '', label: allLabel }, ...opts.map(o => ({ val: o, label: OPT_ICONS[o] || o }))];
+        return `<div class="segmented-group filter-seg" style="flex:1 1 auto;min-width:180px">
+          ${items.map(it => {
+            const act = cur === it.val;
+            const theme = OPT_THEMES[it.val] || '';
+            return `<button type="button" class="segmented-btn ${act ? 'active ' + theme : ''}" onclick="txF.${k}='${it.val}';render()">${it.label}</button>`;
+          }).join('')}
+        </div>`;
+      };
       return {
         html: `<div class="card">
- <div class="filters">${sel('type', ['รายรับ', 'รายจ่าย'], 'ทุกประเภท')}${sel('nature', ['คงที่', 'ผันผวน'], 'ทุกลักษณะ')}${sel('cat', cats, 'ทุกหมวดหมู่')}
- <input placeholder="🔍 ค้นหา..." value="${esc(txF.q)}" onchange="txF.q=this.value;render()">
- <label class="chip" style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" style="width:auto" ${txF.all ? 'checked' : ''} onchange="txF.all=this.checked;render()">แสดงทุกเดือน</label></div>
+ <div class="filters">
+  ${filterSeg('type', ['รายรับ', 'รายจ่าย'], 'ทุกประเภท')}
+  ${filterSeg('nature', ['คงที่', 'ผันผวน'], 'ทุกลักษณะ')}
+  ${sel('cat', cats, 'ทุกหมวดหมู่')}
+  <input placeholder="🔍 ค้นหา..." value="${esc(txF.q)}" onchange="txF.q=this.value;render()">
+  <label class="chip" style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" style="width:auto" ${txF.all ? 'checked' : ''} onchange="txF.all=this.checked;render()">แสดงทุกเดือน</label>
+ </div>
  <div class="chips"><div class="chip">รายการ<b>${L.length}</b></div><div class="chip">รายรับ<b class="up">${baht(inc)}</b></div><div class="chip">รายจ่าย (ไม่รวมผ่อน)<b class="down">${baht(exp)}</b></div>
  <div class="chip">ผ่อนบัตรเดือนนี้ (ดึงอัตโนมัติ)<b>${baht(instInMonth(curYM))}</b></div></div>
  <div class="tbl"><div class="tbl-hint">💡 แตะที่แถวเพื่อดูรายละเอียดทั้งหมด / แก้ไข / ลบ</div><table><thead><tr><th>วันที่</th><th class="col-hide-sm">ประเภท</th><th class="col-hide-sm">ลักษณะ</th><th class="col-hide-sm">หมวดหมู่</th><th>รายละเอียด</th><th class="col-hide-sm">ความถี่</th><th class="col-hide-sm">ช่องทาง</th><th class="num">จำนวนเงิน</th><th class="col-hide-sm">หมายเหตุ</th><th class="col-hide-sm"></th><th class="col-show-sm"></th></tr></thead><tbody>
@@ -3034,7 +3204,13 @@
       catch (e) { if (e.message !== 'auth') toast('ส่งไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต', '⚠️'); }
     }
     function notifyCard() {
-      const n = NS(), yn = (k, l) => `<label><span>${l}</span><select onchange="setN('${k}',this.value==='1')"><option value="1" ${n[k] ? 'selected' : ''}>เปิด</option><option value="0" ${!n[k] ? 'selected' : ''}>ปิด</option></select></label>`;
+      const n = NS(), yn = (k, l) => {
+        const on = !!n[k];
+        return `<label><span>${l}</span><div class="segmented-group" style="margin-top:2px">
+          <button type="button" class="segmented-btn ${on ? 'active theme-inc' : ''}" onclick="setN('${k}',true)">✓ เปิด</button>
+          <button type="button" class="segmented-btn ${!on ? 'active' : ''}" onclick="setN('${k}',false)">✕ ปิด</button>
+        </div></label>`;
+      };
       return `<div class="card" style="margin-bottom:16px"><h3>💬 แจ้งเตือนผ่าน Google Chat <span class="badge ${CLOUD ? 'b-green' : 'b-gray'}">${CLOUD ? 'โหมดคลาวด์' : 'โหมดออฟไลน์'}</span></h3>
  <div class="set-grid">${yn('enabled', 'แจ้งเตือนครบกำหนดทุกวัน')}
  <label><span>แจ้งล่วงหน้า (วัน)</span><input type="number" min="0" max="30" value="${n.daysBefore}" onchange="setN('daysBefore',+this.value)"></label>
