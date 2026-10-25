@@ -704,11 +704,22 @@
     }
     function askKey() {
       if (!CLOUD) return;
-      $('#mTitle').textContent = '🔐 เข้าสู่ระบบ';
-      $('#mForm').innerHTML = `<label class="full"><span>รหัสผ่านแอป (APP_PIN ที่ตั้งไว้ใน Netlify)</span><input name="k" type="password" required autofocus></label>
- <div class="actions full"><button type="button" class="btn ghost" onclick="closeModal();setSync('📴 ใช้แบบออฟไลน์','b-gray')">ใช้แบบออฟไลน์</button><button class="btn primary">เข้าสู่ระบบ</button></div>`;
-      $('#mForm').onsubmit = e => { e.preventDefault(); localStorage.setItem(AUTH, $('#mForm').k.value.trim()); closeModal(); pull() };
-      $('#modal').classList.add('show');
+      openForm('🔐 เข้าสู่ระบบ', [
+        { key: 'k', label: 'รหัสผ่านแอป (APP_PIN ที่ตั้งไว้ใน Netlify)', type: 'password', req: true, full: true }
+      ], {}, o => {
+        localStorage.setItem(AUTH, o.k.trim());
+        closeModal();
+        pull();
+      }, () => {
+        // โค้ดที่จะรันหลังเปิด Modal สำเร็จ เพื่อใส่ลิงก์ปุ่มยกเลิกให้ถูกต้อง
+        const box = $('#mForm');
+        if (box) {
+          const cancelBtn = box.querySelector('.btn.ghost');
+          if (cancelBtn) {
+            cancelBtn.onclick = () => { closeModal(); setSync('📴 ใช้แบบออฟไลน์', 'b-gray'); };
+          }
+        }
+      });
     }
     function logout() { localStorage.removeItem(AUTH); setSync('📴 ออกจากระบบแล้ว', 'b-gray'); askKey() }
     const today = () => S.settings.refDate || ymd(new Date());

@@ -1,11 +1,8 @@
 {
   "name": "money-manager",
-  "version": "1.0.0",
+  "private": true,
   "type": "module",
-  "description": "Money Manager application",
-  "scripts": {
-    "dev": "netlify dev",
-    "build": "echo \"No build step required\""
-  },
-  "dependencies": {}
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
 }
