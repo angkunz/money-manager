@@ -53,6 +53,13 @@
       padding: 0;
     }
 
+    html,
+    body {
+      max-width: 100vw;
+      overflow-x: hidden;
+      position: relative;
+    }
+
     body {
       font-family: 'IBM Plex Sans Thai', sans-serif;
       background-color: #f7f9fc;
@@ -273,6 +280,8 @@
       margin-left: 240px;
       padding: 24px 28px 80px;
       min-width: 0;
+      max-width: 100vw;
+      box-sizing: border-box;
       transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -560,6 +569,34 @@
       border-bottom: none;
     }
 
+    .clickable-row {
+      cursor: pointer;
+      -webkit-tap-highlight-color: rgba(250, 204, 21, 0.25);
+    }
+
+    .clickable-row:hover td {
+      background: #fef9c3 !important;
+    }
+
+    .clickable-row:active td {
+      background: #fde047 !important;
+    }
+
+    .tbl-hint {
+      display: none;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-bottom: 2px solid #e2e8f0;
+      user-select: none;
+    }
+
+    .col-show-sm {
+      display: none;
+    }
+
     /* Badges */
     .badge {
       display: inline-flex;
@@ -730,6 +767,94 @@
       border-bottom: 2px solid var(--border);
     }
 
+    .modal-box-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .modal-box-header h3 {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .modal-box-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--coral);
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 2px 0 var(--border);
+      flex-shrink: 0;
+      transition: transform 0.1s;
+    }
+
+    .modal-box-close:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0 var(--border);
+    }
+
+    .modal-box-close:active {
+      transform: translate(1px, 1px);
+      box-shadow: 0 0 0 var(--border);
+    }
+
+    .detail-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      background: #fff;
+    }
+
+    .detail-table th,
+    .detail-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 13px;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .detail-table th {
+      width: 38%;
+      color: #475569;
+      font-weight: 700;
+      background: #f8fafc;
+      text-align: left;
+      border-right: 1.5px solid var(--border);
+      position: static;
+      vertical-align: top;
+    }
+
+    .detail-table td {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .detail-table tr:last-child th,
+    .detail-table tr:last-child td {
+      border-bottom: none;
+    }
+
     #mForm {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -856,7 +981,10 @@
 
       main {
         margin-left: 0 !important;
-        padding: 16px 14px 100px;
+        padding: 14px 12px 100px !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
       }
 
       .topbar {
@@ -870,12 +998,145 @@
 
       .tools {
         width: 100%;
-        justify-content: space-between;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
       }
 
       .tools input {
         flex: 1;
         min-width: 120px;
+      }
+
+      .tools .btn {
+        flex: 0 0 auto;
+      }
+
+      .grid {
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .g6 {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+
+      .g2,
+      .g11 {
+        grid-template-columns: 1fr !important;
+      }
+
+      .kpi {
+        padding: 12px 10px;
+      }
+
+      .kpi .lbl {
+        font-size: 11px;
+        line-height: 1.2;
+      }
+
+      .kpi .val {
+        font-size: 19px;
+      }
+
+      .kpi .chg {
+        font-size: 10px;
+      }
+
+      .chips {
+        gap: 6px;
+      }
+
+      .chip {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .chip b {
+        font-size: 14px;
+      }
+
+      .filters {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .filters > * {
+        width: 100% !important;
+        min-width: 0 !important;
+      }
+
+      .tbl {
+        max-height: 480px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      th,
+      td {
+        padding: 9px 8px;
+        font-size: 12px;
+      }
+
+      .badge {
+        padding: 3px 8px;
+        font-size: 11px;
+      }
+
+      .chart {
+        height: 220px;
+      }
+
+      .chart.sm {
+        height: 180px;
+      }
+
+      .cc {
+        padding: 16px;
+        min-height: 150px;
+      }
+
+      .set-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .actions .btn {
+        flex: 1 1 auto;
+      }
+
+      .modal {
+        padding: 12px;
+      }
+
+      .modal-box {
+        padding: 16px 14px;
+        border-radius: 20px;
+        max-height: 85vh;
+      }
+
+      .tbl-hint {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .col-hide-sm {
+        display: none !important;
+      }
+
+      .col-show-sm {
+        display: table-cell !important;
+      }
+
+      div.col-show-sm,
+      span.col-show-sm {
+        display: block !important;
       }
 
       #mForm {
@@ -1097,6 +1358,50 @@
         border-top: 2px dashed #e2e8f0;
       }
     }
+
+    @media (max-width: 420px) {
+      main {
+        padding: 10px 8px 100px !important;
+      }
+
+      .topbar {
+        padding: 10px 12px;
+      }
+
+      .topbar h1 {
+        font-size: 16px;
+      }
+
+      .tools {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+      }
+
+      .tools > * {
+        width: 100% !important;
+      }
+
+      .g6 {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 6px !important;
+      }
+
+      .kpi {
+        padding: 10px 8px;
+      }
+
+      .kpi .val {
+        font-size: 17px;
+      }
+
+      th,
+      td {
+        padding: 8px 6px;
+        font-size: 11px;
+      }
+    }
   </style>
 </head>
 
@@ -1166,6 +1471,18 @@
     <div class="modal-box">
       <h3 id="mTitle"></h3>
       <form id="mForm"></form>
+    </div>
+  </div>
+
+  <!-- Detail Popup Modal -->
+  <div class="modal" id="detailModal" onclick="if(event.target===this)closeDetailModal()">
+    <div class="modal-box">
+      <div class="modal-box-header">
+        <h3 id="detailTitle">รายละเอียด</h3>
+        <button class="modal-box-close" onclick="closeDetailModal()" title="ปิด">✕</button>
+      </div>
+      <div id="detailContent"></div>
+      <div class="actions" id="detailActions" style="margin-top:16px"></div>
     </div>
   </div>
   <div id="toast"></div>
@@ -1457,6 +1774,191 @@
       return `<input name="${f.key}" type="${f.type || 'text'}" value="${esc(v)}" ${f.req ? 'required' : ''} ${f.type === 'number' ? 'step="any"' : ''} ${f.min != null ? `min="${f.min}"` : ''} ${f.max != null ? `max="${f.max}"` : ''}>`;
     }
     function closeModal() { $('#modal').classList.remove('show') }
+    function closeDetailModal() { $('#detailModal')?.classList.remove('show') }
+    function showDetailModal({ title, rows, actions }) {
+      const m = $('#detailModal');
+      if (!m) return;
+      $('#detailTitle').textContent = title || 'รายละเอียด';
+      const tbody = rows.map(([k, v]) => `<tr><th>${k}</th><td>${v ?? '-'}</td></tr>`).join('');
+      $('#detailContent').innerHTML = `<table class="detail-table"><tbody>${tbody}</tbody></table>`;
+      const act = $('#detailActions');
+      if (actions && actions.length) {
+        act.innerHTML = actions.map(a => `<button class="btn ${a.cls || ''}" onclick="${a.onClick}">${a.label}</button>`).join(' ');
+        act.style.display = 'flex';
+      } else {
+        act.innerHTML = `<button class="btn primary" onclick="closeDetailModal()" style="width:100%">ปิด</button>`;
+        act.style.display = 'flex';
+      }
+      m.classList.add('show');
+    }
+
+    function viewTxDetail(id) {
+      const t = S.tx.find(x => x.id === id);
+      if (!t) return;
+      const isInc = t.type === 'รายรับ';
+      const rows = [
+        ['วันที่', dLabel(t.date)],
+        ['ประเภท', `<span class="badge ${isInc ? 'b-green' : 'b-red'}">${t.type}</span>`],
+        ['ลักษณะรายจ่าย', isInc ? '-' : `<span class="badge ${t.nature === 'คงที่' ? 'b-blue' : 'b-yellow'}">${t.nature || '-'}</span>`],
+        ['หมวดหมู่', esc(t.category || '-')],
+        ['รายละเอียด', `<b>${esc(t.desc || '-')}</b>`],
+        ['จำนวนเงิน', `<b class="${isInc ? 'up' : 'down'}" style="font-size:16px">${isInc ? '+' : '-'}${baht(t.amount)}</b>`],
+        ['ความถี่', t.freq || 'รายครั้ง'],
+        ['ช่องทางชำระ', esc(t.method || '-')],
+        ['หมายเหตุ', esc(t.note || '-')]
+      ];
+      showDetailModal({
+        title: '📄 รายละเอียดรายการ',
+        rows,
+        actions: [
+          { label: '✏️ แก้ไข', cls: 'sm', onClick: `closeDetailModal(); txForm('${t.id}')` },
+          { label: '🗑️ ลบ', cls: 'sm danger', onClick: `closeDetailModal(); del('tx','${t.id}','${esc(t.desc)}')` },
+          { label: 'ปิด', cls: 'primary sm', onClick: 'closeDetailModal()' }
+        ]
+      });
+    }
+
+    function viewInstDetail(id) {
+      const raw = S.inst.find(x => x.id === id);
+      if (!raw) return;
+      const i = instCalc(raw);
+      const sc = { 'กำลังผ่อน': 'b-blue', 'ยังไม่เริ่มผ่อน': 'b-yellow', 'ผ่อนครบแล้ว': 'b-green' };
+      const rows = [
+        ['รายการ', `<b>${esc(i.item)}</b>`],
+        ['บัตรเครดิต', `💳 ${esc(i.card)}`],
+        ['วันที่ซื้อ', dLabel(i.date)],
+        ['ยอดซื้อ (เงินต้น)', baht(i.principal)],
+        ['อัตราดอกเบี้ย', `${i.rate}% ต่อเดือน`],
+        ['ยอดรวมทั้งสิ้น', baht(i.total)],
+        ['ค่างวดต่อเดือน', `<b class="down" style="font-size:16px">${baht(i.per)}</b>`],
+        ['ความคืบหน้า', `${i.done}/${i.months} งวด (เหลือ ${i.left} งวด)`],
+        ['จ่ายแล้วสะสม', `<span class="up">${baht(i.paid)}</span>`],
+        ['ยอดหนี้คงเหลือ', `<b class="down">${baht(i.remain)}</b>`],
+        ['งวดถัดไป', dLabel(i.next)],
+        ['สถานะ', `<span class="badge ${sc[i.status]}">${i.status}</span>`]
+      ];
+      showDetailModal({
+        title: '💳 รายละเอียดการผ่อน',
+        rows,
+        actions: [
+          { label: '✏️ แก้ไข', cls: 'sm', onClick: `closeDetailModal(); instForm('${i.id}')` },
+          { label: '🗑️ ลบ', cls: 'sm danger', onClick: `closeDetailModal(); del('inst','${i.id}','${esc(i.item)}')` },
+          { label: 'ปิด', cls: 'primary sm', onClick: 'closeDetailModal()' }
+        ]
+      });
+    }
+
+    function viewInstMonths(id) {
+      const raw = S.inst.find(x => x.id === id);
+      if (!raw) return;
+      const i = instCalc(raw);
+      const M = [...Array(12)].map((_, k) => addYM(curYM, k));
+      const rows = [
+        ['รายการ', `<b>${esc(i.item)}</b> (${esc(i.card)})`],
+        ['ยอดต่องวด', baht(i.per)],
+        ['หนี้คงเหลือ', baht(i.remain)],
+        ...M.map(m => {
+          const v = sum(i.dues.filter(d => ymOf(d.date) === m));
+          return [ymLabel(m), v ? `<b class="down">${baht(v)}</b>` : '<span class="hint">-</span>'];
+        })
+      ];
+      showDetailModal({
+        title: `📅 ตารางผ่อน 12 เดือน: ${esc(i.item)}`,
+        rows
+      });
+    }
+
+    function viewBillDetail(id) {
+      const b = S.bills.find(x => x.id === id);
+      if (!b) return;
+      const rows = [
+        ['รายการ', `<b>${esc(b.name)}</b>`],
+        ['หมวดหมู่', esc(b.category)],
+        ['ลักษณะรายจ่าย', b.nature || 'คงที่'],
+        ['จำนวนเงินโดยประมาณ', `<b class="down" style="font-size:16px">${baht(b.amount)}</b>`],
+        ['วันครบกำหนด', `ทุกวันที่ ${b.day} ของเดือน`],
+        ['ตัดอัตโนมัติ', b.auto === 'ใช่' ? '<span class="badge b-gray">ตัดอัตโนมัติ</span>' : 'ชำระเอง']
+      ];
+      showDetailModal({
+        title: '📋 รายละเอียดรายการประจำ',
+        rows,
+        actions: [
+          { label: '✏️ แก้ไข', cls: 'sm', onClick: `closeDetailModal(); billForm('${b.id}')` },
+          { label: '🗑️ ลบ', cls: 'sm danger', onClick: `closeDetailModal(); del('bills','${b.id}','${esc(b.name)}')` },
+          { label: 'ปิด', cls: 'primary sm', onClick: 'closeDetailModal()' }
+        ]
+      });
+    }
+
+    function viewWeekDetail(wNum) {
+      const W = weeks(curYM), [y, m] = curYM.split('-').map(Number);
+      const w = W.find(x => x.w === wNum);
+      if (!w) return;
+      const d = w.budget - w.vari;
+      const daysCount = w.e - w.s + 1;
+      const rows = [
+        ['สัปดาห์', `สัปดาห์ที่ ${w.w}`],
+        ['ช่วงวันที่', `${w.s} - ${w.e} ${TH_M[m - 1]} (${daysCount} วัน)`],
+        ['รายรับ', `<b class="up">${baht(w.inc)}</b>`],
+        ['รายจ่ายคงที่', baht(w.fix)],
+        ['รายจ่ายผันผวน', baht(w.vari)],
+        ['ผ่อนบัตรเครดิต', baht(w.inst)],
+        ['รวมรายจ่ายทั้งสิ้น', `<b class="down">${baht(w.exp)}</b>`],
+        ['คงเหลือสุทธิ', `<b class="${w.net >= 0 ? 'up' : 'down'}" style="font-size:16px">${baht(w.net)}</b>`],
+        ['งบผันผวนประจำสัปดาห์', baht(w.budget)],
+        ['ผลต่างเทียบงบ', `<b class="${d >= 0 ? 'up' : 'down'}">${baht(d)} (${d >= 0 ? 'อยู่ในงบ' : 'เกินงบ'})</b>`],
+        ['จ่ายเฉลี่ยต่อวัน (ผันผวน)', `${baht(w.vari / daysCount)} / วัน`],
+        ['หมวดที่ใช้มากสุด', esc(w.top || '-')],
+        ['สถานะ', `<span class="badge ${d >= 0 ? 'b-green' : 'b-red'}">${d >= 0 ? 'อยู่ในงบ' : 'เกินงบ'}</span>`]
+      ];
+      showDetailModal({
+        title: `📊 สรุปสัปดาห์ที่ ${w.w} (${ymLabel(curYM)})`,
+        rows
+      });
+    }
+
+    function viewBudgetDetail(cat) {
+      const cs = catSpend(curYM), B = S.settings.budgets;
+      const b = B[cat] || 0, v = cs[cat] || 0, p = b ? (v / b) * 100 : (v ? 100 : 0);
+      const diff = b - v;
+      const rows = [
+        ['หมวดหมู่', `<b>${esc(cat)}</b>`],
+        ['งบประมาณที่ตั้งไว้', baht(b)],
+        ['จ่ายจริง', `<b class="${diff >= 0 ? '' : 'down'}">${baht(v)}</b>`],
+        ['คงเหลือ / ส่วนต่าง', `<b class="${diff >= 0 ? 'up' : 'down'}" style="font-size:16px">${diff >= 0 ? 'เหลือ ' + baht(diff) : 'เกินงบ ' + baht(-diff)}</b>`],
+        ['สัดส่วนที่ใช้', `${p.toFixed(1)}% ของงบ`],
+        ['สถานะ', `<span class="badge ${p > 100 ? 'b-red' : p > 80 ? 'b-yellow' : 'b-green'}">${p > 100 ? 'เกินงบ' : p > 80 ? 'ใกล้เต็มนิสัย' : 'ปกติ'}</span>`]
+      ];
+      showDetailModal({
+        title: `🎯 งบประมาณ: ${esc(cat)} (${ymLabel(curYM)})`,
+        rows
+      });
+    }
+
+    function viewLedgerDetail(ym) {
+      const L = ledger(curYM >= S.settings.startMonth ? curYM : S.settings.startMonth);
+      const F = forecast(addYM(L.at(-1).ym, 1), L);
+      const R = [...L, F];
+      const x = R.find(item => item.ym === ym);
+      if (!x) return;
+      const rows = [
+        ['เดือน', `<b>${ymLabel(x.ym)}</b>`],
+        ['ยอดยกมาต้นเดือน', baht(x.open)],
+        ['รายรับ', `<b class="up">${baht(x.inc)}</b>`],
+        ['รายจ่ายคงที่', baht(x.fix)],
+        ['รายจ่ายผันผวน', baht(x.vari)],
+        ['ผ่อนบัตรเครดิต', baht(x.inst)],
+        ['รวมรายจ่ายทั้งสิ้น', `<b class="down">${baht(x.exp)}</b>`],
+        ['คงเหลือสุทธิ', `<b class="${x.net >= 0 ? 'up' : 'down'}">${baht(x.net)}</b>`],
+        ['ยอดยกไปสิ้นเดือน', `<b class="up" style="font-size:16px">${baht(x.close)}</b>`],
+        ['อัตราเงินเหลือ', `${x.rate.toFixed(1)}%`],
+        ['สถานะ', `<span class="badge ${x.fc ? 'b-gray' : x.ym === ymOf(today()) ? 'b-blue' : x.ym < ymOf(today()) ? 'b-green' : 'b-gray'}">${x.fc ? 'ประมาณการ' : x.ym === ymOf(today()) ? 'เดือนปัจจุบัน' : x.ym < ymOf(today()) ? 'ปิดบัญชีแล้ว' : 'อนาคต'}</span>`]
+      ];
+      showDetailModal({
+        title: `📈 บัญชีรายเดือน: ${ymLabel(x.ym)}`,
+        rows
+      });
+    }
     const upsert = (arr, o) => { if (o.id) { const i = arr.findIndex(x => x.id === o.id); arr[i] = o } else { o.id = uid(); arr.push(o) } };
     function del(arr, id, label) { if (!confirm(`ลบ "${label}" ใช่หรือไม่?`)) return; S[arr] = S[arr].filter(x => x.id !== id); save(); render(); toast('ลบแล้ว') }
 
@@ -1491,10 +1993,10 @@
  <label class="chip" style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" style="width:auto" ${txF.all ? 'checked' : ''} onchange="txF.all=this.checked;render()">แสดงทุกเดือน</label></div>
  <div class="chips"><div class="chip">รายการ<b>${L.length}</b></div><div class="chip">รายรับ<b class="up">${baht(inc)}</b></div><div class="chip">รายจ่าย (ไม่รวมผ่อน)<b class="down">${baht(exp)}</b></div>
  <div class="chip">ผ่อนบัตรเดือนนี้ (ดึงอัตโนมัติ)<b>${baht(instInMonth(curYM))}</b></div></div>
- <div class="tbl"><table><thead><tr><th>วันที่</th><th>ประเภท</th><th>ลักษณะ</th><th>หมวดหมู่</th><th>รายละเอียด</th><th>ความถี่</th><th>ช่องทาง</th><th class="num">จำนวนเงิน</th><th>หมายเหตุ</th><th></th></tr></thead><tbody>
- ${L.map(t => `<tr><td>${dLabel(t.date)}</td><td><span class="badge ${t.type === 'รายรับ' ? 'b-green' : 'b-red'}">${t.type}</span></td><td>${t.nature === '-' ? '-' : `<span class="badge ${t.nature === 'คงที่' ? 'b-blue' : 'b-yellow'}">${t.nature}</span>`}</td>
- <td>${esc(t.category)}</td><td>${esc(t.desc)}</td><td>${t.freq}</td><td>${esc(t.method)}</td><td class="num ${t.type === 'รายรับ' ? 'up' : 'down'}"><b>${t.type === 'รายรับ' ? '+' : '-'}${fmt(t.amount)}</b></td><td class="hint">${esc(t.note)}</td>
- <td><button class="btn sm" onclick="txForm('${t.id}')">แก้ไข</button> <button class="btn sm danger" onclick="del('tx','${t.id}','${esc(t.desc)}')">ลบ</button></td></tr>`).join('') || `<tr><td colspan="10" class="empty">ยังไม่มีรายการ</td></tr>`}
+ <div class="tbl"><div class="tbl-hint">💡 แตะที่แถวเพื่อดูรายละเอียดทั้งหมด / แก้ไข / ลบ</div><table><thead><tr><th>วันที่</th><th class="col-hide-sm">ประเภท</th><th class="col-hide-sm">ลักษณะ</th><th class="col-hide-sm">หมวดหมู่</th><th>รายละเอียด</th><th class="col-hide-sm">ความถี่</th><th class="col-hide-sm">ช่องทาง</th><th class="num">จำนวนเงิน</th><th class="col-hide-sm">หมายเหตุ</th><th class="col-hide-sm"></th><th class="col-show-sm"></th></tr></thead><tbody>
+ ${L.map(t => `<tr class="clickable-row" onclick="viewTxDetail('${t.id}')"><td>${dLabel(t.date)}</td><td class="col-hide-sm"><span class="badge ${t.type === 'รายรับ' ? 'b-green' : 'b-red'}">${t.type}</span></td><td class="col-hide-sm">${t.nature === '-' ? '-' : `<span class="badge ${t.nature === 'คงที่' ? 'b-blue' : 'b-yellow'}">${t.nature}</span>`}</td>
+ <td class="col-hide-sm">${esc(t.category)}</td><td><div><b>${esc(t.desc)}</b><div class="col-show-sm" style="margin-top:2px;font-size:11px;color:var(--muted)"><span class="badge ${t.type === 'รายรับ' ? 'b-green' : 'b-red'}" style="padding:1px 6px;font-size:10px">${t.type}</span>${t.category ? ` · ${esc(t.category)}` : ''}${t.method ? ` · ${esc(t.method)}` : ''}</div></div></td><td class="col-hide-sm">${t.freq}</td><td class="col-hide-sm">${esc(t.method)}</td><td class="num ${t.type === 'รายรับ' ? 'up' : 'down'}"><b>${t.type === 'รายรับ' ? '+' : '-'}${fmt(t.amount)}</b></td><td class="hint col-hide-sm">${esc(t.note)}</td>
+ <td class="col-hide-sm"><button class="btn sm" onclick="event.stopPropagation();txForm('${t.id}')">แก้ไข</button> <button class="btn sm danger" onclick="event.stopPropagation();del('tx','${t.id}','${esc(t.desc)}')">ลบ</button></td><td class="col-show-sm" style="text-align:center"><button class="btn sm" onclick="event.stopPropagation();viewTxDetail('${t.id}')">🔍</button></td></tr>`).join('') || `<tr><td colspan="11" class="empty">ยังไม่มีรายการ</td></tr>`}
  </tbody></table></div></div>`};
     }
 
@@ -1607,14 +2109,14 @@
         html: `<div class="chips"><div class="chip">หนี้ผ่อนคงเหลือ<b class="down">${baht(sum(L, i => i.remain))}</b></div><div class="chip">ผ่อน ${ymShort(curYM)}<b>${baht(instInMonth(curYM))}</b></div>
  <div class="chip">ผ่อน ${ymShort(addYM(curYM, 1))}<b>${baht(instInMonth(addYM(curYM, 1)))}</b></div><div class="chip">รายการที่กำลังผ่อน<b>${L.filter(i => i.status !== 'ผ่อนครบแล้ว').length}</b></div>
  <button class="btn primary" onclick="instForm()" style="margin-left:auto">+ เพิ่มรายการผ่อน</button></div>
- <div class="card" style="margin-bottom:16px"><h3>รายการผ่อนทั้งหมด</h3><div class="tbl"><table><thead><tr><th>รายการ</th><th>บัตร</th><th>วันที่ซื้อ</th><th class="num">ยอดซื้อ</th><th class="num">ดอกเบี้ย</th><th class="num">ยอดรวมทั้งสิ้น</th><th class="num">ต่องวด</th><th>ความคืบหน้า</th><th class="num">จ่ายแล้ว</th><th class="num">คงเหลือ</th><th>งวดถัดไป</th><th>สถานะ</th><th></th></tr></thead><tbody>
- ${L.map(i => `<tr><td><b>${esc(i.item)}</b></td><td>${esc(i.card)}</td><td>${dLabel(i.date)}</td><td class="num">${fmt(i.principal)}</td><td class="num">${i.rate}%</td><td class="num">${fmt(i.total)}</td><td class="num"><b>${fmt(i.per)}</b></td>
- <td><div class="bar" style="--c:#6366f1"><i style="width:${i.done / i.months * 100}%"></i></div><small class="hint">${i.done}/${i.months} งวด (เหลือ ${i.left})</small></td>
- <td class="num up">${fmt(i.paid)}</td><td class="num down"><b>${fmt(i.remain)}</b></td><td>${dLabel(i.next)}</td><td><span class="badge ${sc[i.status]}">${i.status}</span></td>
- <td><button class="btn sm" onclick="instForm('${i.id}')">แก้ไข</button> <button class="btn sm danger" onclick="del('inst','${i.id}','${esc(i.item)}')">ลบ</button></td></tr>`).join('') || '<tr><td colspan="13" class="empty">ยังไม่มีรายการผ่อน</td></tr>'}
+ <div class="card" style="margin-bottom:16px"><h3>รายการผ่อนทั้งหมด</h3><div class="tbl"><div class="tbl-hint">💡 แตะที่แถวเพื่อดูรายละเอียดทั้งหมด / แก้ไข / ลบ</div><table><thead><tr><th>รายการ</th><th class="col-hide-sm">บัตร</th><th class="col-hide-sm">วันที่ซื้อ</th><th class="num col-hide-sm">ยอดซื้อ</th><th class="num col-hide-sm">ดอกเบี้ย</th><th class="num col-hide-sm">ยอดรวมทั้งสิ้น</th><th class="num">ต่องวด</th><th class="col-hide-sm">ความคืบหน้า</th><th class="num col-hide-sm">จ่ายแล้ว</th><th class="num">คงเหลือ</th><th class="col-hide-sm">งวดถัดไป</th><th>สถานะ</th><th class="col-hide-sm"></th><th class="col-show-sm"></th></tr></thead><tbody>
+ ${L.map(i => `<tr class="clickable-row" onclick="viewInstDetail('${i.id}')"><td><div><b>${esc(i.item)}</b><div class="col-show-sm" style="margin-top:4px;font-size:11px;color:var(--muted)"><span>💳 ${esc(i.card)}</span><div class="bar" style="--c:#6366f1;margin:4px 0 2px;height:7px"><i style="width:${i.done / i.months * 100}%"></i></div><span>งวด ${i.done}/${i.months} (เหลือ ${i.left})</span></div></div></td><td class="col-hide-sm">${esc(i.card)}</td><td class="col-hide-sm">${dLabel(i.date)}</td><td class="num col-hide-sm">${fmt(i.principal)}</td><td class="num col-hide-sm">${i.rate}%</td><td class="num col-hide-sm">${fmt(i.total)}</td><td class="num"><b>${fmt(i.per)}</b></td>
+ <td class="col-hide-sm"><div class="bar" style="--c:#6366f1"><i style="width:${i.done / i.months * 100}%"></i></div><small class="hint">${i.done}/${i.months} งวด (เหลือ ${i.left})</small></td>
+ <td class="num up col-hide-sm">${fmt(i.paid)}</td><td class="num down"><b>${fmt(i.remain)}</b></td><td class="col-hide-sm">${dLabel(i.next)}</td><td><span class="badge ${sc[i.status]}">${i.status}</span></td>
+ <td class="col-hide-sm"><button class="btn sm" onclick="event.stopPropagation();instForm('${i.id}')">แก้ไข</button> <button class="btn sm danger" onclick="event.stopPropagation();del('inst','${i.id}','${esc(i.item)}')">ลบ</button></td><td class="col-show-sm" style="text-align:center"><button class="btn sm" onclick="event.stopPropagation();viewInstDetail('${i.id}')">🔍</button></td></tr>`).join('') || '<tr><td colspan="14" class="empty">ยังไม่มีรายการผ่อน</td></tr>'}
  </tbody></table></div></div>
- <div class="card"><h3>ตารางผ่อนรายเดือน (12 เดือนตั้งแต่ ${ymLabel(curYM)})</h3><div class="tbl"><table><thead><tr><th>รายการ</th><th>บัตร</th>${M.map(m => `<th class="num">${ymShort(m)}</th>`).join('')}</tr></thead><tbody>
- ${act.map(i => `<tr><td>${esc(i.item)}</td><td>${esc(i.card)}</td>${M.map(m => { const v = sum(i.dues.filter(d => ymOf(d.date) === m)); return `<td class="num">${v ? fmt(v) : '<span class="hint">-</span>'}</td>` }).join('')}</tr>`).join('')}
+ <div class="card"><h3>ตารางผ่อนรายเดือน (12 เดือนตั้งแต่ ${ymLabel(curYM)})</h3><div class="tbl"><div class="tbl-hint">💡 เลื่อนซ้าย-ขวาเพื่อดูครบ 12 เดือน หรือแตะที่แถวเพื่อดูสรุป</div><table><thead><tr><th>รายการ</th><th>บัตร</th>${M.map(m => `<th class="num">${ymShort(m)}</th>`).join('')}</tr></thead><tbody>
+ ${act.map(i => `<tr class="clickable-row" onclick="viewInstMonths('${i.id}')"><td><b>${esc(i.item)}</b></td><td>${esc(i.card)}</td>${M.map(m => { const v = sum(i.dues.filter(d => ymOf(d.date) === m)); return `<td class="num">${v ? fmt(v) : '<span class="hint">-</span>'}</td>` }).join('')}</tr>`).join('')}
  </tbody><tfoot><tr><td colspan="2">รวมต่อเดือน</td>${M.map(m => `<td class="num">${fmt(instInMonth(m))}</td>`).join('')}</tr>
  <tr><td colspan="2">หนี้คงเหลือสิ้นเดือน</td>${M.map(m => `<td class="num down">${fmt(debtEnd(m))}</td>`).join('')}</tr></tfoot></table></div></div>`
       };
@@ -1674,9 +2176,9 @@
           const btn = a.kind === 'bill' ? (a.auto ? '<span class="badge b-gray">ตัดอัตโนมัติ</span>' : `<button class="btn sm ok" onclick="payBill('${a.id}','${a.ym}')">ชำระแล้ว</button>`) : (a.first ? `<button class="btn sm ok" onclick="payCard(${a.ci})">ชำระแล้ว</button>` : '');
           return `<div class="item"><div class="t"><b>${esc(a.name)}</b><small>${a.type} · ครบ ${dLabel(a.due)} · <b>${baht(a.amount)}</b>${a.detail ? ' · ' + a.detail : ''}</small></div><span class="badge ${c}">${t}</span>${btn}</div>`
         }).join('') || '<div class="empty">ไม่มีรายการ</div>'}</div>
- <div class="card"><h3>📋 รายการที่ต้องจ่ายประจำ <button class="btn sm primary" onclick="billForm()">+ เพิ่ม</button></h3><div class="tbl"><table><thead><tr><th>รายการ</th><th>หมวด</th><th class="num">จำนวน</th><th>วันที่</th><th></th></tr></thead><tbody>
- ${S.bills.map(b => `<tr><td>${esc(b.name)} ${b.auto === 'ใช่' ? '<span class="badge b-gray">อัตโนมัติ</span>' : ''}</td><td>${esc(b.category)}</td><td class="num">${fmt(b.amount)}</td><td>ทุกวันที่ ${b.day}</td>
- <td><button class="btn sm" onclick="billForm('${b.id}')">แก้ไข</button> <button class="btn sm danger" onclick="del('bills','${b.id}','${esc(b.name)}')">ลบ</button></td></tr>`).join('')}</tbody></table></div></div></div>`
+ <div class="card"><h3>📋 รายการที่ต้องจ่ายประจำ <button class="btn sm primary" onclick="billForm()">+ เพิ่ม</button></h3><div class="tbl"><div class="tbl-hint">💡 แตะที่แถวเพื่อดูรายละเอียด / แก้ไข / ลบ</div><table><thead><tr><th>รายการ</th><th class="col-hide-sm">หมวด</th><th class="num">จำนวน</th><th>วันที่</th><th class="col-hide-sm"></th><th class="col-show-sm"></th></tr></thead><tbody>
+ ${S.bills.map(b => `<tr class="clickable-row" onclick="viewBillDetail('${b.id}')"><td><div><b>${esc(b.name)}</b> ${b.auto === 'ใช่' ? '<span class="badge b-gray" style="padding:1px 6px;font-size:10px">อัตโนมัติ</span>' : ''}<div class="col-show-sm" style="font-size:11px;color:var(--muted)">${esc(b.category)}</div></div></td><td class="col-hide-sm">${esc(b.category)}</td><td class="num"><b>${fmt(b.amount)}</b></td><td>ทุกวันที่ ${b.day}</td>
+ <td class="col-hide-sm"><button class="btn sm" onclick="event.stopPropagation();billForm('${b.id}')">แก้ไข</button> <button class="btn sm danger" onclick="event.stopPropagation();del('bills','${b.id}','${esc(b.name)}')">ลบ</button></td><td class="col-show-sm" style="text-align:center"><button class="btn sm" onclick="event.stopPropagation();viewBillDetail('${b.id}')">🔍</button></td></tr>`).join('')}</tbody></table></div></div></div>`
       };
     }
 
@@ -1688,13 +2190,13 @@
         const W = weeks(curYM), [y, m] = curYM.split('-').map(Number);
         return {
           html: tabs + `<div class="card" style="margin-bottom:16px"><h3>รายงานรายสัปดาห์ ${ymLabel(curYM)}</h3><div class="chart"><canvas id="cW"></canvas></div></div>
-  <div class="card"><div class="tbl"><table><thead><tr><th>สัปดาห์</th><th>ช่วงวันที่</th><th class="num">รายรับ</th><th class="num">คงที่</th><th class="num">ผันผวน</th><th class="num">ผ่อนบัตร</th><th class="num">รวมจ่าย</th><th class="num">คงเหลือ</th><th class="num">งบผันผวน</th><th class="num">ผลต่าง</th><th class="num">เฉลี่ย/วัน</th><th>หมวดที่ใช้มากสุด</th><th>สถานะ</th></tr></thead><tbody>
+  <div class="card"><div class="tbl"><div class="tbl-hint">💡 แตะที่แถวเพื่อดูรายละเอียดสัปดาห์เต็ม</div><table><thead><tr><th>สัปดาห์</th><th class="col-hide-sm">ช่วงวันที่</th><th class="num">รายรับ</th><th class="num col-hide-sm">คงที่</th><th class="num col-hide-sm">ผันผวน</th><th class="num col-hide-sm">ผ่อนบัตร</th><th class="num">รวมจ่าย</th><th class="num">คงเหลือ</th><th class="num col-hide-sm">งบผันผวน</th><th class="num col-hide-sm">ผลต่าง</th><th class="num col-hide-sm">เฉลี่ย/วัน</th><th class="col-hide-sm">หมวดที่ใช้มากสุด</th><th class="col-hide-sm">สถานะ</th><th class="col-show-sm"></th></tr></thead><tbody>
   ${W.map(w => {
-            const d = w.budget - w.vari; return `<tr><td>สัปดาห์ ${w.w}</td><td>${w.s}-${w.e} ${TH_M[m - 1]}</td><td class="num up">${fmt(w.inc)}</td><td class="num">${fmt(w.fix)}</td><td class="num">${fmt(w.vari)}</td><td class="num">${fmt(w.inst)}</td><td class="num down">${fmt(w.exp)}</td>
-  <td class="num ${w.net >= 0 ? 'up' : 'down'}"><b>${fmt(w.net)}</b></td><td class="num">${fmt(w.budget)}</td><td class="num ${d >= 0 ? 'up' : 'down'}">${fmt(d)}</td><td class="num">${fmt(w.vari / (w.e - w.s + 1))}</td><td>${esc(w.top)}</td>
-  <td><span class="badge ${d >= 0 ? 'b-green' : 'b-red'}">${d >= 0 ? 'อยู่ในงบ' : 'เกินงบ'}</span></td></tr>`
+            const d = w.budget - w.vari; return `<tr class="clickable-row" onclick="viewWeekDetail(${w.w})"><td><div><b>สัปดาห์ ${w.w}</b><div class="col-show-sm" style="font-size:11px;color:var(--muted)">${w.s}-${w.e} ${TH_M[m - 1]}</div></div></td><td class="col-hide-sm">${w.s}-${w.e} ${TH_M[m - 1]}</td><td class="num up">${fmt(w.inc)}</td><td class="num col-hide-sm">${fmt(w.fix)}</td><td class="num col-hide-sm">${fmt(w.vari)}</td><td class="num col-hide-sm">${fmt(w.inst)}</td><td class="num down">${fmt(w.exp)}</td>
+  <td class="num ${w.net >= 0 ? 'up' : 'down'}"><b>${fmt(w.net)}</b></td><td class="num col-hide-sm">${fmt(w.budget)}</td><td class="num ${d >= 0 ? 'up' : 'down'} col-hide-sm">${fmt(d)}</td><td class="num col-hide-sm">${fmt(w.vari / (w.e - w.s + 1))}</td><td class="col-hide-sm">${esc(w.top)}</td>
+  <td class="col-hide-sm"><span class="badge ${d >= 0 ? 'b-green' : 'b-red'}">${d >= 0 ? 'อยู่ในงบ' : 'เกินงบ'}</span></td><td class="col-show-sm" style="text-align:center"><button class="btn sm" onclick="event.stopPropagation();viewWeekDetail(${w.w})">🔍</button></td></tr>`
           }).join('')}</tbody>
-  <tfoot><tr><td colspan="2">รวม</td>${['inc', 'fix', 'vari', 'inst', 'exp', 'net', 'budget'].map(k => `<td class="num">${fmt(sum(W, w => w[k]))}</td>`).join('')}<td colspan="4"></td></tr></tfoot></table></div></div>`,
+  <tfoot><tr><td colspan="2" class="col-hide-sm">รวม</td><td class="col-show-sm">รวม</td><td class="num up">${fmt(sum(W, w => w.inc))}</td><td class="num col-hide-sm">${fmt(sum(W, w => w.fix))}</td><td class="num col-hide-sm">${fmt(sum(W, w => w.vari))}</td><td class="num col-hide-sm">${fmt(sum(W, w => w.inst))}</td><td class="num down">${fmt(sum(W, w => w.exp))}</td><td class="num ${sum(W, w => w.net) >= 0 ? 'up' : 'down'}"><b>${fmt(sum(W, w => w.net))}</b></td><td class="num col-hide-sm">${fmt(sum(W, w => w.budget))}</td><td colspan="4" class="col-hide-sm"></td><td class="col-show-sm"></td></tr></tfoot></table></div></div>`,
           after() {
             mk('cW', {
               type: 'bar', data: {
@@ -1713,12 +2215,12 @@
         const rows = S.settings.cats.expense.filter(c => B[c] || cs[c]);
         return {
           html: tabs + `<div class="grid g6">${kpi('รายรับ', a.inc, null, 'var(--inc)', 1, baht, ymLabel(curYM))}${kpi('รายจ่ายคงที่', a.fix, null, '#6366f1', 0, baht, ' ')}${kpi('รายจ่ายผันผวน', a.vari, null, '#f59e0b', 0, baht, ' ')}${kpi('ผ่อนบัตร', a.inst, null, '#ec4899', 0, baht, ' ')}${kpi('คงเหลือสุทธิ', a.net, null, '#06b6d4', 1, baht, `อัตราเงินเหลือ ${a.rate.toFixed(1)}%`)}</div>
-  <div class="grid g2"><div class="card"><h3>งบประมาณเทียบกับที่จ่ายจริงรายหมวด</h3><div class="tbl"><table><thead><tr><th>หมวด</th><th class="num">งบ</th><th class="num">จ่ายจริง</th><th class="num">คงเหลือ</th><th>% ใช้งบ</th></tr></thead><tbody>
+  <div class="grid g2"><div class="card"><h3>งบประมาณเทียบกับที่จ่ายจริงรายหมวด</h3><div class="tbl"><div class="tbl-hint">💡 แตะที่แถวเพื่อดูรายละเอียดงบประมาณ</div><table><thead><tr><th>หมวด</th><th class="num">งบ</th><th class="num">จ่ายจริง</th><th class="num col-hide-sm">คงเหลือ</th><th>% ใช้งบ</th></tr></thead><tbody>
   ${rows.map(c => {
-            const b = B[c] || 0, v = cs[c] || 0, p = b ? v / b * 100 : (v ? 100 : 0); return `<tr><td>${esc(c)}</td><td class="num">${fmt(b)}</td><td class="num">${fmt(v)}</td><td class="num ${b - v >= 0 ? 'up' : 'down'}">${fmt(b - v)}</td>
+            const b = B[c] || 0, v = cs[c] || 0, p = b ? v / b * 100 : (v ? 100 : 0); return `<tr class="clickable-row" onclick="viewBudgetDetail('${esc(c)}')"><td><b>${esc(c)}</b></td><td class="num">${fmt(b)}</td><td class="num">${fmt(v)}</td><td class="num ${b - v >= 0 ? 'up' : 'down'} col-hide-sm">${fmt(b - v)}</td>
   <td><div style="display:flex;gap:8px;align-items:center"><div class="bar" style="--c:${p > 100 ? '#f43f5e' : p > 80 ? '#f59e0b' : '#10b981'};flex:1"><i style="width:${Math.min(p, 100)}%"></i></div><small>${p.toFixed(0)}%</small></div></td></tr>`
           }).join('')}</tbody>
-  <tfoot><tr><td>รวม</td><td class="num">${fmt(sum(rows, c => B[c]))}</td><td class="num">${fmt(sum(rows, c => cs[c]))}</td><td class="num">${fmt(sum(rows, c => (B[c] || 0) - (cs[c] || 0)))}</td><td></td></tr></tfoot></table></div></div>
+  <tfoot><tr><td>รวม</td><td class="num">${fmt(sum(rows, c => B[c]))}</td><td class="num">${fmt(sum(rows, c => cs[c]))}</td><td class="num col-hide-sm">${fmt(sum(rows, c => (B[c] || 0) - (cs[c] || 0)))}</td><td></td></tr></tfoot></table></div></div>
   <div class="card"><h3>หลัก 50/30/20</h3>${rule.map(([l, v, t, c]) => {
             const p = a.inc ? v / a.inc * 100 : 0; return `<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between"><b>${l}</b><span>${p.toFixed(1)}% <span class="hint">/ เป้า ${t}%</span></span></div>
   <div class="bar" style="--c:${c};margin:6px 0;height:10px"><i style="width:${Math.min(p, 100)}%"></i></div><div class="hint">${baht(v)} · ${p <= t || t === 20 && p >= t ? '✓ ' : '⚠ '}${t === 20 ? (p >= t ? 'ผ่านเป้า' : 'ต่ำกว่าเป้า') : (p <= t ? 'อยู่ในเกณฑ์' : 'สูงกว่าเกณฑ์')}</div></div>`
@@ -1733,10 +2235,10 @@
       const L = ledger(curYM >= S.settings.startMonth ? curYM : S.settings.startMonth), F = forecast(addYM(L.at(-1).ym, 1), L), R = [...L, F];
       return {
         html: tabs + `<div class="card" style="margin-bottom:16px"><h3>ยอดยกไปสะสม</h3><div class="chart sm"><canvas id="cL"></canvas></div></div>
- <div class="card"><div class="tbl"><table><thead><tr><th>เดือน</th><th class="num">ยอดยกมา</th><th class="num">รายรับ</th><th class="num">คงที่</th><th class="num">ผันผวน</th><th class="num">ผ่อนบัตร</th><th class="num">รวมจ่าย</th><th class="num">คงเหลือสุทธิ</th><th class="num">ยอดยกไป</th><th class="num">% เหลือ</th><th>สถานะ</th></tr></thead><tbody>
- ${R.map(x => `<tr style="${x.fc ? 'opacity:.7;font-style:italic' : ''}"><td><b>${ymLabel(x.ym)}</b></td><td class="num">${fmt(x.open)}</td><td class="num up">${fmt(x.inc)}</td><td class="num">${fmt(x.fix)}</td><td class="num">${fmt(x.vari)}</td><td class="num">${fmt(x.inst)}</td><td class="num down">${fmt(x.exp)}</td>
- <td class="num ${x.net >= 0 ? 'up' : 'down'}">${fmt(x.net)}</td><td class="num"><b>${fmt(x.close)}</b></td><td class="num">${x.rate.toFixed(1)}%</td>
- <td><span class="badge ${x.fc ? 'b-gray' : x.ym === ymOf(today()) ? 'b-blue' : x.ym < ymOf(today()) ? 'b-green' : 'b-gray'}">${x.fc ? 'ประมาณการ' : x.ym === ymOf(today()) ? 'เดือนปัจจุบัน' : x.ym < ymOf(today()) ? 'ปิดบัญชีแล้ว' : 'อนาคต'}</span></td></tr>`).join('')}</tbody></table></div></div>`,
+ <div class="card"><div class="tbl"><div class="tbl-hint">💡 แตะที่แถวเพื่อดูสรุปบัญชีรายเดือนเต็ม</div><table><thead><tr><th>เดือน</th><th class="num col-hide-sm">ยอดยกมา</th><th class="num">รายรับ</th><th class="num col-hide-sm">คงที่</th><th class="num col-hide-sm">ผันผวน</th><th class="num col-hide-sm">ผ่อนบัตร</th><th class="num">รวมจ่าย</th><th class="num col-hide-sm">คงเหลือสุทธิ</th><th class="num">ยอดยกไป</th><th class="num col-hide-sm">% เหลือ</th><th class="col-hide-sm">สถานะ</th><th class="col-show-sm"></th></tr></thead><tbody>
+ ${R.map(x => `<tr class="clickable-row" style="${x.fc ? 'opacity:.7;font-style:italic' : ''}" onclick="viewLedgerDetail('${x.ym}')"><td><b>${ymLabel(x.ym)}</b></td><td class="num col-hide-sm">${fmt(x.open)}</td><td class="num up">${fmt(x.inc)}</td><td class="num col-hide-sm">${fmt(x.fix)}</td><td class="num col-hide-sm">${fmt(x.vari)}</td><td class="num col-hide-sm">${fmt(x.inst)}</td><td class="num down">${fmt(x.exp)}</td>
+ <td class="num ${x.net >= 0 ? 'up' : 'down'} col-hide-sm">${fmt(x.net)}</td><td class="num"><b>${fmt(x.close)}</b></td><td class="num col-hide-sm">${x.rate.toFixed(1)}%</td>
+ <td class="col-hide-sm"><span class="badge ${x.fc ? 'b-gray' : x.ym === ymOf(today()) ? 'b-blue' : x.ym < ymOf(today()) ? 'b-green' : 'b-gray'}">${x.fc ? 'ประมาณการ' : x.ym === ymOf(today()) ? 'เดือนปัจจุบัน' : x.ym < ymOf(today()) ? 'ปิดบัญชีแล้ว' : 'อนาคต'}</span></td><td class="col-show-sm" style="text-align:center"><button class="btn sm" onclick="event.stopPropagation();viewLedgerDetail('${x.ym}')">🔍</button></td></tr>`).join('')}</tbody></table></div></div>`,
         after() {
           mk('cL', {
             type: 'line', data: {
@@ -1923,6 +2425,7 @@
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
         closeModal();
+        closeDetailModal();
         closeMobileMenu();
       }
     });
